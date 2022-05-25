@@ -101,7 +101,7 @@ class Dept_info_model extends CI_Model
     {
         // 過濾可用欄位資料
         $data = array_intersect_key($data, array_flip($this->tableColumns));
-
+        
         // 移除主鍵欄位 - 新增時不帶入主鍵值，以便主鍵由sql自行增加
         unset($data['d_id']);
 
