@@ -75,7 +75,7 @@ $query_builder = TRUE;
 
 $db['default'] = array(
 	'dsn'	=> '',
-	'hostname' => 'localhost',
+	'hostname' => 'db.rd1.local.gcp',
 	'username' => 'harvey_huang',
 	'password' => 'KAdrQ[*ak!5cpDh0',
 	'database' => 'harvey_huang',
