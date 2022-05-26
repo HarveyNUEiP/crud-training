@@ -1,11 +1,11 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
 
-class Hello_bootstrap extends CI_Controller
+class Bootstrap_practice extends CI_Controller
 {
 
     public function index()
     {
-        $this->load->view('helloBootstrap');
+        $this->load->view('bootstrapPractice');
     }
 }

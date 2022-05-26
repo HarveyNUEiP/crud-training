@@ -79,18 +79,25 @@ defined('BASEPATH') or exit('No direct script access allowed');
 				<li class="page-item"><a class="page-link" href="#">Next</a></li>
 			</ul>
 		</div>
+
+		<!-- Trigger the Modal -->
+		<div class="row">
+			<div class="col-sm-4">
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#myModal">Launch myModal</button>
+			</div>
+		</div>
 	</div>
 
 
 	<!-- The Modal -->
-	<div class="modal" id="myModal">
+	<div class="modal fade" id="myModal"  data-bs-backdrop="static" aria-hidden="true">
 		<div class="modal-dialog">
 			<div class="modal-content">
 
 				<!-- Modal Header -->
 				<div class="modal-header">
 					<h4 class="modal-title">Modal Heading</h4>
-					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
 				</div>
 
 				<!-- Modal body -->
@@ -100,7 +107,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 				<!-- Modal footer -->
 				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
 				</div>
 
 			</div>
