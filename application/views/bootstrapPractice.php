@@ -45,40 +45,33 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     <input class="form-check-input" type="checkbox" name="remember"> Remember me
                 </label>
             </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         <br>
 
         <h2>Popover Example</h2>
-        <button type="button" class="btn btn-default" title="Popover title"  
-		    	data-container="body" data-toggle="popover" data-placement="left" 
-		    	data-content="左侧的 Popover 中的一些内容">
-		    左侧的 Popover
-	    </button>
-	    <button type="button" class="btn btn-primary" title="Popover title"  
-                data-container="body" data-toggle="popover" data-placement="top" 
-		    	data-content="顶部的 Popover 中的一些内容">
-	    	顶部的 Popover
-	    </button>
-	    <button type="button" class="btn btn-success" title="Popover title"  
-			    data-container="body" data-toggle="popover" data-placement="bottom" 
-			    data-content="底部的 Popover 中的一些内容">
-		    底部的 Popover
-	    </button>
-	    <button type="button" class="btn btn-warning" title="Popover title"  
-			    data-container="body" data-toggle="popover" data-placement="right" 
-			    data-content="右侧的 Popover 中的一些内容">
-		    右侧的 Popover
-	    </button><br>
+        <button type="button" class="btn btn-default" title="Popover title" data-container="body" data-toggle="popover" data-placement="left" data-content="左侧的 Popover 中的一些内容">
+            左侧的 Popover
+        </button>
+        <button type="button" class="btn btn-primary" title="Popover title" data-container="body" data-toggle="popover" data-placement="top" data-content="顶部的 Popover 中的一些内容">
+            顶部的 Popover
+        </button>
+        <button type="button" class="btn btn-success" title="Popover title" data-container="body" data-toggle="popover" data-placement="bottom" data-content="底部的 Popover 中的一些内容">
+            底部的 Popover
+        </button>
+        <button type="button" class="btn btn-warning" title="Popover title" data-container="body" data-toggle="popover" data-placement="right" data-content="右侧的 Popover 中的一些内容">
+            右侧的 Popover
+        </button><br>
 
         <h2>Tooltips Example</h2>
         <a href="#" data-toggle="tooltip" title="Hooray!">Hover over me</a>
-        
+
     </div>
-<script>
-$(document).ready(function(){
-  $('[data-toggle="popover"]').popover();   
-});
-</script>
+    <script>
+        $(document).ready(function() {
+            $('[data-toggle="popover"]').popover();
+        });
+    </script>
 </body>
+
 </html>
