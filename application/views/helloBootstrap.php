@@ -22,7 +22,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 	</div>
 
-<h1 class="text-primary">.text-primary</h1>
+	<h1 class="text-primary">.text-primary</h1>
 
 </body>
+
 </html>
