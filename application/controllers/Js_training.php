@@ -92,7 +92,7 @@ class Js_training extends CI_Controller
             // 標題資料
             'head' => [
                 'name',
-                'location',
+                'location'
             ],
             // 多筆內容資料
             'data' => [

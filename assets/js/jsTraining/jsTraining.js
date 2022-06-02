@@ -95,7 +95,6 @@
         */
       var _initialize = function() {
         console.log('_initialize');
-        
         /**
           * 刪除一筆
           */
@@ -122,6 +121,7 @@
             url: self._ajaxUrls.accountApi,
             dataType: 'json',
         }).done(function(data) {
+            console.log(data.data);
             // 處理回傳資料 - 印出json字串
             $('<div>' + JSON.stringify(data) + '</div>').appendTo($('.ctrl-message'));
         
