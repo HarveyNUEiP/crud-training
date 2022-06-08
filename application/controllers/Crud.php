@@ -64,16 +64,28 @@ class Crud extends CI_Controller
      */
     protected function _create($data)
     {
-        // 建立輸出陣列
-        $opt = [
-            // 行為：新增一筆
-            'type' => '新增一筆',
-            // 前端AJAX傳過來的資料
-            'data' => $data,
-        ];
+        try {
+            // 資料驗證 丟錯誤訊息
+            if (false) {
+                throw new Exception('帳號驗證失敗', 400);
+            };
 
-        // 輸出JSON
-        echo json_encode($opt);
+            // 載入model
+            $this->load->model('crud_model');
+            $opt = $this->crud_model->post($data);
+
+            // 輸出JSON
+            echo json_encode($opt);
+
+        // 接收錯誤訊息
+        } catch (Exception $e) {
+            http_response_code($e->getCode());
+            echo json_encode([
+                'message' => $e->getMessage()
+            ]);
+            exit;
+        };
+        
     }
 
     /**
@@ -85,14 +97,11 @@ class Crud extends CI_Controller
     {
         
         $this->load->model('crud_model');
+        $opt = $this->crud_model->get();
         
-
         // 輸出JSON
-        // echo json_encode();
+        echo json_encode($opt);
     }
-
-
-
 
     /**
      * 讀取一筆資料
@@ -122,17 +131,11 @@ class Crud extends CI_Controller
      * @return array
      */
 
-    protected function _update($data, $id)
+    protected function _update($data)
     {
-        // 建立輸出陣列
-        $opt = [
-            // 行為：更新一筆
-            'type' => '更新一筆',
-            // 前端AJAX傳過來的資料
-            'data' => $data,
-            'id' => $id
-        ];
-
+        
+        $this->load->model('crud_model');
+        $opt = $this->crud_model->put();
         // 輸出JSON
         echo json_encode($opt);
     }

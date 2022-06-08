@@ -36,7 +36,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </span>
                 </div>
             </div>
-            <div class="col-sm-4"><button class="btn btn-warning" data-toggle="modal" data-target="#myModal">新增</button></div>
+            <div class="col-sm-4"><button class="btn btn-warning" data-toggle="modal" data-target="#insertModal">新增</button></div>
             <div class="btn-group sort-btn">
                 <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="flase">排序</button>
                 <button class="btn btn-primary dropdown-toggle" data-sort="none"><i class="fa fa-sort"></i></button>
@@ -52,15 +52,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <table class="table table-striped table-bordered table-hover ctrl-table">
                 <thead>
                     <tr>
-                        <th>
-                            <td>Id</td>
-                            <td>Account</td>
-                            <td>Name</td>
-                            <td>Sex</td>
-                            <td>Birthday</td>
-                            <td>Email</td>
-                            <td>Comments</td>
-                        </th>
+                        <th>Actions</th>
+                        <th>Id</th>
+                        <th>Account</th>
+                        <th>Name</th>
+                        <th>Sex</th>
+                        <th>Birthday</th>
+                        <th>Email</th>
+                        <th>Comments</th>
                     </tr>
                 </thead>
             </table>
@@ -81,8 +80,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
     </div>
 
-    <!-- The Create Modal -->
-    <div class="modal fade" id="myModal" data-backdrop="static" aria-hidden="true">
+    <!-- The Insert Modal -->
+    <div class="modal fade" id="insertModal" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
 
@@ -93,41 +92,43 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </div>
 
                 <!-- Modal body -->
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="accountInput">Account*</label>
-                        <input type="text" class="form-control" id="accountInput" placeholder="Account">
-                    </div>
-                    <div class="form-group">
-                        <label for="nameInput">Name*</label>
-                        <input type="text" class="form-control" id="nameInput" placeholder="name">
-                    </div>
-                    <div>
-                        <p><b>Sex*</b></p>
-                        <label class="radio-sex">
-                            <input type="radio" name="sexOptions" id="sexRadio1" value="male"> Male
-                        </label>
-                        <label class="radio-sex">
-                            <input type="radio" name="sexOptions" id="sexRadio2" value="female"> Female
-                        </label>
-                    </div>    
-                    <div>
-                        <p><b>Birthday*</b></p>
-                        <input type="text" class="form-control" id="birthdayInput" placeholder="ex:1999-03-22">
-                    </div>
-                    <div>
-                        <p><b>Email*</b></p>
-                        <input type="text" class="form-control" id="emailInput" placeholder="email@example.com">
-                    </div>
-                    <div>
-                        <p><b>Comments</b></p>
-                        <textarea class="form-control" rows="3"></textarea>
-                    </div>
+                <div class="modal-body insert">
+                    <form id="insertForm">
+                        <div class="form-group">
+                            <label for="accountInput">Account*</label>
+                            <input type="text" class="form-control" id="accountInput" name="account" placeholder="Account">
+                        </div>
+                        <div class="form-group">
+                            <label for="nameInput">Name*</label>
+                            <input type="text" class="form-control" id="nameInput" name="name" placeholder="name">
+                        </div>
+                        <div>
+                            <p><b>Sex*</b></p>
+                            <label class="radio-sex">
+                                <input type="radio" name="sex" id="sexRadio1"  value="Male"> Male
+                            </label>
+                            <label class="radio-sex">
+                                <input type="radio" name="sex" id="sexRadio2" value="Female"> Female
+                            </label>
+                        </div>    
+                        <div>
+                            <p><b>Birthday*</b></p>
+                            <input type="text" class="form-control" id="birthdayInput" name="birthday" placeholder="ex:1999-03-22">
+                        </div>
+                        <div>
+                            <p><b>Email*</b></p>
+                            <input type="text" class="form-control" id="emailInput" name="email" placeholder="email@example.com">
+                        </div>
+                        <div>
+                            <p><b>Comments</b></p>
+                            <textarea class="form-control" id="commentsInput" name="comments" rows="3"></textarea>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success">確認</button>
+                    <button type="button" class="btn btn-success insert-confirm-btn">完成</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
                 </div>
 
@@ -148,40 +149,42 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                 <!-- Modal body -->
                 <div class="modal-body">
-                <div class="form-group">
-                        <label for="accountInput">Account*</label>
-                        <input type="text" class="form-control" id="accountInput" placeholder="Account">
-                    </div>
-                    <div class="form-group">
-                        <label for="nameInput">Name*</label>
-                        <input type="text" class="form-control" id="nameInput" placeholder="name">
-                    </div>
-                    <div>
-                        <p><b>Sex*</b></p>
-                        <label class="radio-sex">
-                            <input type="radio" name="sexOptions" id="sexRadio1" value="male"> Male
-                        </label>
-                        <label class="radio-sex">
-                            <input type="radio" name="sexOptions" id="sexRadio2" value="female"> Female
-                        </label>
-                    </div>    
-                    <div>
-                        <p><b>Birthday*</b></p>
-                        <input type="text" class="form-control" id="birthdayInput" placeholder="ex:1999-03-22">
-                    </div>
-                    <div>
-                        <p><b>Email*</b></p>
-                        <input type="text" class="form-control" id="emailInput" placeholder="email@example.com">
-                    </div>
-                    <div>
-                        <p><b>Comments</b></p>
-                        <textarea class="form-control" rows="3"></textarea>
-                    </div>
+                    <form id="modifyForm">
+                        <div class="form-group">
+                            <label for="accountInput">Account*</label>
+                            <input type="text" class="form-control" id="accountInput" name="account" placeholder="Account">
+                        </div>
+                        <div class="form-group">
+                            <label for="nameInput">Name*</label>
+                            <input type="text" class="form-control" id="nameInput" name="name" placeholder="name">
+                        </div>
+                        <div>
+                            <p><b>Sex*</b></p>
+                            <label class="radio-sex">
+                                <input type="radio" name="sexOptions" id="sexRadio1" value="Male"> Male
+                            </label>
+                            <label class="radio-sex">
+                                <input type="radio" name="sexOptions" id="sexRadio2" value="Female"> Female
+                            </label>
+                        </div>    
+                        <div>
+                            <p><b>Birthday*</b></p>
+                            <input type="text" class="form-control" id="birthdayInput" name="birthday" placeholder="ex:1999-03-22">
+                        </div>
+                        <div>
+                            <p><b>Email*</b></p>
+                            <input type="text" class="form-control" id="emailInput" name="email" placeholder="email@example.com">
+                        </div>
+                        <div>
+                            <p><b>Comments</b></p>
+                            <textarea class="form-control" id="commentsInput" name="comments" rows="3"></textarea>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success">完成</button>
+                    <button type="button" class="btn btn-success modify-confirm-btn">完成</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
                 </div>
             </div>

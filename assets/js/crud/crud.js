@@ -55,12 +55,37 @@
     var _initialize = function() {
       console.log('_initialize');
       
+      loadAllData();
+    /**
+     * 事件綁定
+     */
+    _evenBind();
+    };
+
+    /**
+     * 事件綁定
+     */
+    var _evenBind = function() {
+      console.log('_evenBind');
+      
+      /**
+       * 事件 - 增加
+       */
+
+      // 按下確認按鈕時 取得account之值
+      $('.insert-confirm-btn').on('click', insertData);
+    };
+
+    /**
+     * 載入全部資料
+     */
+    var loadAllData = function () {
       $.ajax({
         method: 'GET',
         url: self._ajaxUrls.accountApi,
         dataType: 'json'
       }).done(function(data) {
-          console.log(data.data);
+          console.log(data);
           // 建立變數
           var tmp, table, tbody, tr, td;
           // 建立暫存容器
@@ -69,8 +94,9 @@
           tbody = $('<tbody></tbody>').appendTo(tmp);
           
           // 建立內容
-          $.each(data.data, function(index1, value1) {
+          $.each(data, function(index1, value1) {
             tr = $('<tr></tr>').appendTo(tbody);
+            tr.data('id', value1['id']);
             td = $('<td><button class="btn" data-toggle="modal" data-target="#modifyModal"><i class="fas fa-pen color_green ml-3"></i></button><button class="btn" data-toggle="modal" data-target="#deleteModal"><i class="fas fa-trash text-danger ml-3"></i></button></td>').appendTo(tr)
             // var accountTd = 
             // $('<td>'+value1['account']+'</td>').appendTo(tr);
@@ -84,16 +110,57 @@
           // 將暫存內容移至table元件
           tmp.children().appendTo(table);
         });
-    /**
-     * 事件綁定
-     */
-    
     };
 
     /**
-     * 載入資料
+     * 新增資料
      */
-    var loadData = function () {
+    var insertData = function () {
+      // 抓取帳號
+      var accountInput = $('#accountInput').val();
+      // 抓取姓名
+      var nameInput = $('#nameInput').val();
+      // 抓取性別
+      var sexInput = $('input[name=sex]:checked').val();
+      // 抓取生日
+      var birthdayInput = $('#birthdayInput').val();
+      // 抓取信箱
+      var emailInput = $('#emailInput').val();
+      // 抓取備註
+      var commentsInput = $('#commentsInput').val();
+      // 定義輸出JSON檔
+      var insData = {
+        'account': accountInput,
+        'name': nameInput,
+        'sex': sexInput,
+        'birthday': birthdayInput,
+        'email': emailInput,
+        'comments': commentsInput
+      };
+
+      // var $form = $('.modal-body .insert').find('form')
+      
+      // var insData = $($form).serializeArray();
+      // console.log(insData);
+      // return;
+      
+      $.ajax({
+        method: 'POST',
+        url: self._ajaxUrls.accountApi,
+        data: insData,
+        dataType: 'json'
+      }).done(function(data) {
+        // 處理回傳資料
+        console.log(data)
+
+        // 判斷是否新增成功
+        if(data != 0) {
+          alert("資料新增成功！");
+          $('#insertModal').modal('hide');
+        };
+      }).fail(function (jqXHR) {
+        console.log(jqXHR);
+      });
     };
 
     /**
