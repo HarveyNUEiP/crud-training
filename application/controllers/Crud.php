@@ -112,12 +112,8 @@ class Crud extends CI_Controller
 
     protected function _read($id)
     {
-        $opt = [
-            // 行為：讀取一筆
-            'type' => '讀取一筆',
-            // 前端AJAX傳過來的資料
-            'id' => $id
-        ];
+        $this->load->model('crud_model');
+        $opt = $this->crud_model->getBy($id);
 
         // 輸出JSON
         echo json_encode($opt);
@@ -131,11 +127,12 @@ class Crud extends CI_Controller
      * @return array
      */
 
-    protected function _update($data)
+    protected function _update($data, $id)
     {
-        
+        // print_r($data);
+        // exit;
         $this->load->model('crud_model');
-        $opt = $this->crud_model->put();
+        $opt = $this->crud_model->put($id, $data);
         // 輸出JSON
         echo json_encode($opt);
     }
@@ -148,13 +145,8 @@ class Crud extends CI_Controller
      */
     protected function _delete($id)
     {
-        // 建立輸出陣列
-        $opt = [
-            // 行為：刪除一筆
-            'type' => '刪除一筆',
-            // 前端AJAX傳過來的資料
-            'id' => $id
-        ];
+        $this->load->model('crud_model');
+        $opt = $this->crud_model->delete($id);
 
         // 輸出JSON
         echo json_encode($opt);

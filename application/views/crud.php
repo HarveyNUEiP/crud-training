@@ -108,7 +108,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                                 <input type="radio" name="sex" id="sexRadio1"  value="Male"> Male
                             </label>
                             <label class="radio-sex">
-                                <input type="radio" name="sex" id="sexRadio2" value="Female"> Female
+                                <input type="radio" name="sex" id="sexRadio1" value="Female"> Female
                             </label>
                         </div>    
                         <div>
@@ -148,36 +148,36 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </div>
 
                 <!-- Modal body -->
-                <div class="modal-body">
+                <div class="modal-body modify">
                     <form id="modifyForm">
                         <div class="form-group">
                             <label for="accountInput">Account*</label>
-                            <input type="text" class="form-control" id="accountInput" name="account" placeholder="Account">
+                            <input type="text" class="form-control" id="accountInput1" name="account" placeholder="Account">
                         </div>
                         <div class="form-group">
                             <label for="nameInput">Name*</label>
-                            <input type="text" class="form-control" id="nameInput" name="name" placeholder="name">
+                            <input type="text" class="form-control" id="nameInput1" name="name" placeholder="name">
                         </div>
                         <div>
                             <p><b>Sex*</b></p>
                             <label class="radio-sex">
-                                <input type="radio" name="sexOptions" id="sexRadio1" value="Male"> Male
+                                <input type="radio" name="sex" id="sexRadio2" value="Male"> Male
                             </label>
                             <label class="radio-sex">
-                                <input type="radio" name="sexOptions" id="sexRadio2" value="Female"> Female
+                                <input type="radio" name="sex" id="sexRadio2" value="Female"> Female
                             </label>
                         </div>    
                         <div>
                             <p><b>Birthday*</b></p>
-                            <input type="text" class="form-control" id="birthdayInput" name="birthday" placeholder="ex:1999-03-22">
+                            <input type="text" class="form-control" id="birthdayInput1" name="birthday" placeholder="ex:1999-03-22">
                         </div>
                         <div>
                             <p><b>Email*</b></p>
-                            <input type="text" class="form-control" id="emailInput" name="email" placeholder="email@example.com">
+                            <input type="text" class="form-control" id="emailInput1" name="email" placeholder="email@example.com">
                         </div>
                         <div>
                             <p><b>Comments</b></p>
-                            <textarea class="form-control" id="commentsInput" name="comments" rows="3"></textarea>
+                            <textarea class="form-control" id="commentsInput1" name="comments" rows="3"></textarea>
                         </div>
                     </form>
                 </div>
@@ -209,7 +209,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                 <!-- Modal footer -->
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-success">是</button>
+                    <button type="button" class="btn btn-success deleteConfirm">是</button>
                     <button type="button" class="btn btn-danger" data-dismiss="modal">否</button>
                 </div>
             </div>
