@@ -37,7 +37,7 @@ class Crud_model extends CI_Model
      */
     public function get($col = '*')
     {
-        return $this->db->select($col)->from($this->table)->get()->result_array(); 
+        return $this->db->select($col)->from($this->table)->get()->result_array();
     }
 
     /**
@@ -51,8 +51,8 @@ class Crud_model extends CI_Model
     {
         // 查詢
         $query = $this->db->select($col)->from($this->table)->where('id', $id);
-        
-        $res = $query->get()->result_array();
+
+        $res = $query->get()->row_array();
         return $res;
     }
 
@@ -66,7 +66,7 @@ class Crud_model extends CI_Model
     {
         // 過濾可用欄位資料
         $data = array_intersect_key($data, array_flip($this->tableColumns));
-        
+
         // 寫入資料表
         $res = $this->db->insert($this->table, $data);
 
@@ -84,20 +84,23 @@ class Crud_model extends CI_Model
     public function put($id, $data)
     {
         $res = $this->db->where('id', $id)->update($this->table, $data);
-       
+
         return $res ? $id : 0;
     }
 
     /**
      * 刪除資料
      *
-     * @param int $id
-     * @return int
+     * @param array|int $id 欲刪除的主鍵值
+     * @return boolean
      */
     public function delete($id)
     {
-        $res = $this->db->where_in('id', $id)->delete($this->table);
+
+        $id = (array) $id;
         
-        return $res ? 1 : 0;
+        $res = $this->db->where_in('id', $id)->delete($this->table);
+
+        return $res;
     }
 }

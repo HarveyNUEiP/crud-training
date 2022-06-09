@@ -14,7 +14,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <script src="node_modules/popper.js"></script>
     <!-- Font Awesome Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" />
-
+    <!-- import javascript -->
     <script src="<?= JS_DIR; ?>crud/crud.js"></script>
 </head>
 
@@ -28,7 +28,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div
         <!-- Controll Form -->
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-sm-4">
                 <div class="input-group">
                     <input type="text" class="form-control" placeholder="請輸入搜尋關鍵字">
                     <span class="input-group-btn">
@@ -36,8 +36,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
                     </span>
                 </div>
             </div>
-            <div class="col-sm-4"><button class="btn btn-warning" data-toggle="modal" data-target="#insertModal">新增</button></div>
-            <div class="btn-group sort-btn">
+            <div class="col-sm-2"><button class="btn btn-warning" data-toggle="modal" data-target="#insertModal">新增</button></div>
+            <div class="col-sm-2 btn-group sort-btn">
                 <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="flase">排序</button>
                 <button class="btn btn-primary dropdown-toggle" data-sort="none"><i class="fa fa-sort"></i></button>
                     <ul class="dropdown-menu">
@@ -45,6 +45,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <li><a href="#" tabindex="-1" data-type="numeric">Account</a></li>
                     </ul>
             </div>
+            <div class="col-sm-2"><button class="btn btn-danger deleteDatas" data-toggle="modal" data-target="#deleteModal">批次刪除</button></div>
         </div>
 
         <!-- Table -->
@@ -52,7 +53,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <table class="table table-striped table-bordered table-hover ctrl-table">
                 <thead>
                     <tr>
-                        <th>Actions</th>
+                        <th><input type="checkbox" name="selectAll">Actions</th>
                         <th>Id</th>
                         <th>Account</th>
                         <th>Name</th>
@@ -123,6 +124,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <p><b>Comments</b></p>
                             <textarea class="form-control" id="commentsInput" name="comments" rows="3"></textarea>
                         </div>
+                        <div>
+                            <p id="errorMessage" style="color:red"></p>
+                        </div>
                     </form>
                 </div>
 
@@ -161,10 +165,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <div>
                             <p><b>Sex*</b></p>
                             <label class="radio-sex">
-                                <input type="radio" name="sex" id="sexRadio2" value="Male"> Male
+                                <input type="radio" name="sex" id="sexRadio3" value="Male"> Male
                             </label>
                             <label class="radio-sex">
-                                <input type="radio" name="sex" id="sexRadio2" value="Female"> Female
+                                <input type="radio" name="sex" id="sexRadio4" value="Female"> Female
                             </label>
                         </div>    
                         <div>
@@ -204,7 +208,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
                 <!-- Modal body -->
                 <div class="modal-body">
-                    <span>確定要刪除這筆資料嗎？</span>
+                    <span>確定要刪除資料嗎？</span>
                 </div>
 
                 <!-- Modal footer -->

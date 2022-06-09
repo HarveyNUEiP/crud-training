@@ -67,7 +67,7 @@
      */
     var _evenBind = function() {
       console.log('_evenBind');
-      
+
       /**
        * 事件 - 增加
        */
@@ -90,13 +90,47 @@
 
       // 點擊刪除按鈕，取得欲刪除資料之id
       $('.container').on('click', '.deleteBtn', function () {
-        $('.deleteConfirm').data('id', $(this).parents('tr').data('id'));
+
+        // 創建一個陣列存放id
+        var id = [];
+
+        // 將陣列放至data物件中
+        var data = {id};
+
+        // 將欲刪除之id放至data中
+        id.push($(this).parents('tr').data('id'));
+        $('.deleteConfirm').data('id', data);
+      });
+
+      // 點擊批次刪除按鈕，取得多個欲刪除資料之id
+      $('.deleteDatas').on('click', function () {
+        
+        // 創建一個陣列存放id
+        var id = [];
+
+        // 將陣列放至data物件中
+        var data = {id};
+
+        // 取得多個checkbox之id，並加入至陣列中
+        $('input[type="checkbox"]').each(function() {
+          if($(this).prop("checked") == true) {
+            id.push($(this).attr("id"))  
+          };
+        });
+
+        // 將欲刪除之id放至data中
+        $('.deleteConfirm').data('id', data);
+
       });
 
       //確認刪除資料
       $('.deleteConfirm').on('click', function () {
-        var id = $('.deleteConfirm').data('id');
-        deleteData(id);
+
+        // 創建data物件
+        var data = $('.deleteConfirm').data('id');
+
+        // 刪除資料
+        deleteData(data);
       });
       
     };
@@ -122,7 +156,7 @@
           $.each(data, function(index1, value1) {
             tr = $('<tr></tr>').appendTo(tbody);
             tr.data('id', value1['id']);
-            td = $('<td><button class="btn modifyBtn" data-toggle="modal" data-target="#modifyModal"><i class="fas fa-pen color_green ml-3"></i></button><button class="btn deleteBtn" data-toggle="modal" data-target="#deleteModal"><i class="fas fa-trash text-danger ml-3"></i></button></td>').appendTo(tr)
+            td = $(`<td><input type="checkbox" id="${value1['id']}"><button class="btn modifyBtn" data-toggle="modal" data-target="#modifyModal"><i class="fas fa-pen color_green ml-3"></i></button><button class="btn deleteBtn" data-toggle="modal" data-target="#deleteModal"><i class="fas fa-trash text-danger ml-3"></i></button></td>`).appendTo(tr)
             // var accountTd = 
             // $('<td>'+value1['account']+'</td>').appendTo(tr);
             $.each(value1, function(index2, value2) {
@@ -147,27 +181,36 @@
       // 將表單序列化
       var insData = $($form).serializeArray();
       
-      // ajax發送新增資料請求
-      $.ajax({
-        method: 'POST',
-        url: self._ajaxUrls.accountApi,
-        data: insData,
-        dataType: 'json'
-      }).done(function(data) {
+      // 資料驗證
+      var dataCheck = dataValidation(insData);
 
-        // 判斷是否新增成功
-        if(data != 0) {
-          alert("資料新增成功！");
-          //關閉modal彈窗
-          $('#insertModal').modal('hide');
-          // 清除tbody資料
-          $('#tableBody').remove();
-          // 刷新資料
-          loadAllData();
-        };
-      }).fail(function (jqXHR) {
-        console.log(jqXHR.statusText);
-      });
+      // 判斷資料驗證是否通過
+      if(dataCheck) {
+
+        // ajax發送新增資料請求
+        $.ajax({
+          method: 'POST',
+          url: self._ajaxUrls.accountApi,
+          data: insData,
+          dataType: 'json'
+        }).done(function(data) {
+            // 通知新增成功
+            alert("資料新增成功！");
+            //關閉modal彈窗
+            $('#insertModal').modal('hide');
+            // 清除tbody資料
+            $('#tableBody').remove();
+            // 刷新資料
+            loadAllData();
+            // 清空表格欄位
+            $('#modifyForm, #insertForm').find('input, textarea').not('input[type=radio]').val('');
+            $('#modifyForm, #insertForm').find('input').prop('checked', false);
+        }).fail(function (jqXHR) {
+          console.log(jqXHR.statusText);
+        });
+      } else {
+        alert('資料格式錯誤，請重新檢查輸入。');
+      };
     };
 
     /**
@@ -179,18 +222,18 @@
         url: self._ajaxUrls.accountApi + `/${id}`,
         dataType: 'json'
       }).done(function (data) {
-        //清除表格
-        $('#modifyForm', 'insertForm').children('input,textarea').val("");
-        $("input").prop('checked', false);
-
+        //清空表格欄位
+        $('#modifyForm, #insertForm').find('input, textarea').not('input[type=radio]').val('');
+        $('#modifyForm, #insertForm').find('input').prop('checked', false);
+        
         // 填入原資料至表格中
-        $('.modify-confirm-btn').data('id', `${data[0]['id']}`);
-        $('#accountInput1').val(`${data[0]['account']}`);
-        $('#nameInput1').val(`${data[0]['name']}`);
-        $(`input[name="sex"][value=${data[0]['sex']}]`).prop("checked", true);
-        $('#birthdayInput1').val(`${data[0]['birthday']}`);
-        $('#emailInput1').val(`${data[0]['email']}`);
-        $('#commentsInput1').val(`${data[0]['comments']}`);
+        $('.modify-confirm-btn').data('id', `${data['id']}`);
+        $('#accountInput1').val(`${data['account']}`);
+        $('#nameInput1').val(`${data['name']}`);
+        $(`input[name="sex"][value=${data['sex']}]`).prop("checked", true);
+        $('#birthdayInput1').val(`${data['birthday']}`);
+        $('#emailInput1').val(`${data['email']}`);
+        $('#commentsInput1').val(`${data['comments']}`);
 
       })
     };
@@ -205,34 +248,42 @@
       // 將表單序列化
       var newData = $($form).serializeArray();
       
-      // ajax發送更新請求
-      $.ajax({
-        method: 'PUT',
-        data: newData,
-        url: self._ajaxUrls.accountApi + `/${id}`,
-        dataType: 'json'
-      }).done(function (data) {
-          // 判斷是否新增成功
-          if(data != 0) {
-            alert("資料更新成功！");
-            //關閉modal彈窗
-            $('#modifyModal').modal('hide');
-            // 清除tbody資料
-            $('#tableBody').remove();
-            // 刷新資料
-            loadAllData();
-          };
-      });
-       
+      // 資料驗證
+      var dataCheck = dataValidation(newData);
+
+      // 判斷資料驗證是否通過
+      if(dataCheck) {
+        // ajax發送更新請求
+        $.ajax({
+          method: 'PUT',
+          data: newData,
+          url: self._ajaxUrls.accountApi + `/${id}`,
+          dataType: 'json'
+        }).done(function (data) {
+            // 判斷是否新增成功
+            if(data != 0) {
+              alert("資料更新成功！");
+              //關閉modal彈窗
+              $('#modifyModal').modal('hide');
+              // 清除tbody資料
+              $('#tableBody').remove();
+              // 刷新資料
+              loadAllData();
+            };
+        });
+      }else {
+        alert('資料格式錯誤，請重新檢查輸入。');
+      };
     };
 
     /**
      * 刪除資料
      */
-    var deleteData = function (id) {
+    var deleteData = function (data) {
       $.ajax({
         method: 'DELETE',
-        url: self._ajaxUrls.accountApi + `/${id}`,
+        url: self._ajaxUrls.accountApi,
+        data: data,
         dataType: 'json'
       }).done(function (data) {
         // 判斷是否刪除成功
@@ -246,6 +297,35 @@
           loadAllData();
         };
       });
+    };
+
+    /**
+     * 資料驗證
+     */
+    var dataValidation = function (data) {
+      var accountReg = /^[a-zA-Z\d]\w{3,13}[a-zA-z\d]$/i;
+      var nameReg = /.+/;
+      var birthdayReg = /^\d{4}-[01][0-9]-[0-3][0-9]$/;
+      var emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+      
+      var accountResult = accountReg.test(data[0]['value']);
+      var nameResult = nameReg.test(data[1]['value']);
+      var sexResult = function (data) {
+        if(data.length == 6) {
+          return true;
+        } else {
+          return false;
+        };
+      };
+      var birthdayResult = birthdayReg.test(data[3]['value']);
+      var emailResult = emailReg.test(data[4]['value']);
+      
+      if(accountResult && nameResult && sexResult && birthdayResult && emailResult) {
+        return true;
+      } else {
+        return false;
+      };
+
     };
 
     /**

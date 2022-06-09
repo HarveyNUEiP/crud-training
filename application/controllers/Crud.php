@@ -39,17 +39,18 @@ class Crud extends CI_Controller
             case 'PATCH':
             case 'PUT':
                 // 更新一筆資料
-                $this->_update($data, $id);
+                $this->_update($id, $data);
                 break;
             case 'DELETE':
-                if (empty($id)) {
+
+                if (empty($data['id'])) {
                     //錯誤
                     http_response_code(404);
                     echo 'No Delete ID';
                     exit;
                 } else {
                     //刪除一筆資料
-                    $this->_delete($id);
+                    $this->_delete($data['id']);
                 }
                 break;
         }
@@ -59,15 +60,18 @@ class Crud extends CI_Controller
     /**
      * 新增一筆
      * 
-     * @param $data
+     * @param array $data
      * @return array
      */
     protected function _create($data)
     {
         try {
-            // 資料驗證 丟錯誤訊息
-            if (false) {
-                throw new Exception('帳號驗證失敗', 400);
+            // 資料驗證
+            $data_check = $this->dataValidation($data);
+
+            // 如驗證失敗：丟錯誤訊息
+            if (!$data_check) {
+                throw new Exception('資料驗證失敗', 400);
             };
 
             // 載入model
@@ -77,7 +81,7 @@ class Crud extends CI_Controller
             // 輸出JSON
             echo json_encode($opt);
 
-        // 接收錯誤訊息
+            // 接收錯誤訊息
         } catch (Exception $e) {
             http_response_code($e->getCode());
             echo json_encode([
@@ -85,7 +89,6 @@ class Crud extends CI_Controller
             ]);
             exit;
         };
-        
     }
 
     /**
@@ -95,10 +98,10 @@ class Crud extends CI_Controller
      */
     protected function _list()
     {
-        
+
         $this->load->model('crud_model');
         $opt = $this->crud_model->get();
-        
+
         // 輸出JSON
         echo json_encode($opt);
     }
@@ -109,7 +112,6 @@ class Crud extends CI_Controller
      * @param int $id 目標資料id
      * @return array
      */
-
     protected function _read($id)
     {
         $this->load->model('crud_model');
@@ -126,15 +128,28 @@ class Crud extends CI_Controller
      * @param int $id 目標資料id
      * @return array
      */
-
-    protected function _update($data, $id)
+    protected function _update($id, $data)
     {
-        // print_r($data);
-        // exit;
-        $this->load->model('crud_model');
-        $opt = $this->crud_model->put($id, $data);
-        // 輸出JSON
-        echo json_encode($opt);
+        try {
+            // 驗證資料
+            $data_check = $this->dataValidation($data);
+
+            // 如驗證失敗，丟錯誤訊息
+            if (!$data_check) {
+                throw new Exception("資料驗證失敗", 400);
+            };
+            // 
+            $this->load->model('crud_model');
+            $opt = $this->crud_model->put($id, $data);
+            // 輸出JSON
+            echo json_encode($opt);
+        } catch (Exception $e) {
+            http_response_code($e->getCode());
+            echo json_encode([
+                'message' => $e->getMessage()
+            ]);
+            exit;
+        }
     }
 
     /**
@@ -150,5 +165,38 @@ class Crud extends CI_Controller
 
         // 輸出JSON
         echo json_encode($opt);
+    }
+
+    /**
+     * 資料驗證
+     *
+     * @param array $data
+     * @return boolean
+     */
+    public function dataValidation($data)
+    {
+
+        $account_reg = '/^[a-zA-Z\d]\w{3,13}[a-zA-z\d]$/i';
+        $name_reg = '/.+/';
+        $birthday_reg = '/^\d{4}-[01][0-9]-[0-3][0-9]$/';
+        $email_reg = '/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/';
+
+        $account_check = preg_match($account_reg, $data['account']);
+        $name_check = preg_match($name_reg, $data['name']);
+        $sex_check = function ($data) {
+            if (count($data) == 6) {
+                return true;
+            } else {
+                return false;
+            };
+        };
+        $birthday_check = preg_match($birthday_reg, $data['birthday']);
+        $email_check = preg_match($email_reg, $data['email']);
+
+        if ($account_check && $name_check && $sex_check && $birthday_check && $email_check) {
+            return true;
+        } else {
+            return false;
+        };
     }
 }
