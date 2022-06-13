@@ -29,8 +29,13 @@ class Crud extends CI_Controller
                 break;
             case 'GET':
                 if (empty($id)) {
-                    // 讀取全部資料
-                    $this->_list();
+                    // 判斷是否有限制筆數
+                    if(empty($_GET['limit'])) {
+                        $this->_list();
+                    } else {
+                        // 讀取全部資料
+                        $this->_list($_GET['limit'], $_GET['offset']);
+                    }
                 } else {
                     // 讀取一筆資料
                     $this->_read($id);
@@ -96,15 +101,14 @@ class Crud extends CI_Controller
      * 
      * @return array
      */
-    protected function _list()
-    {
+    protected function _list($limit = '', $offset = '') {
 
         $this->load->model('crud_model');
-        $opt = $this->crud_model->get();
+        $opt = $this->crud_model->get($limit, $offset);
 
-        // 輸出JSON
         echo json_encode($opt);
     }
+
 
     /**
      * 讀取一筆資料
@@ -199,4 +203,5 @@ class Crud extends CI_Controller
             return false;
         };
     }
+
 }

@@ -66,6 +66,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </table>
         </div>
 
+        <div>
+            每頁顯示筆數
+            <select class="pageSelector">
+            <option value="10">10筆</option>
+            <option value="15">15筆</option>
+            <option value="20">20筆</option>
+            </select>
+        </div>
+
         <!-- Pagination -->
         <div class="row pull-right">
             <ul class="pagination">

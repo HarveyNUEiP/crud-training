@@ -27,17 +27,37 @@ class Crud_model extends CI_Model
         $this->load->database();
     }
 
-
     /**
      * 讀取全部資料
      *
-     * @param int $id 目標主鍵資料
-     * @param string $col 輸出欄位
-     * @return array
+     * @param string $limit 限制筆數
+     * @param string $offset 跳過幾筆
+     * @param string $col 選擇欄位
+     * @return void
      */
-    public function get($col = '*')
+    public function get($limit = '', $offset = '', $col = '*')
     {
-        return $this->db->select($col)->from($this->table)->get()->result_array();
+        // 建立輸出陣列
+        $opt = [];
+
+        // 判斷是否有limit條件
+        if(empty($limit)){
+            $res = $this->db->select($col)->from($this->table)->get()->result_array();
+            $num = $this->getNumbers();
+            $opt = [
+                'numbers' => $num,
+                'data' => $res
+            ];
+            return $opt;
+        } else {
+            $res = $this->db->select($col)->from($this->table)->limit($limit,$offset)->get()->result_array();
+            $num = $this->getNumbers();
+            $opt = [
+                'numbers' => $num,
+                'data' => $res
+            ];
+            return $opt;
+        }
     }
 
     /**
@@ -102,5 +122,17 @@ class Crud_model extends CI_Model
         $res = $this->db->where_in('id', $id)->delete($this->table);
 
         return $res;
+    }
+
+    /**
+     * 取得所有資料總筆數
+     *
+     * @return int
+     */
+    public function getNumbers()
+    {
+        $num = $this->db->count_all_results($this->table);
+
+        return $num;
     }
 }

@@ -40,6 +40,7 @@
     // Application Options initialize
     var _options = options || {};
     var _jqXHRs;
+    var numberOfDatas;
 
     /**
      * 建構子
@@ -55,7 +56,8 @@
     var _initialize = function() {
       console.log('_initialize');
       
-      loadAllData();
+      loadAllData(10);
+
     /**
      * 事件綁定
      */
@@ -123,7 +125,7 @@
 
       });
 
-      //確認刪除資料
+      // 確認刪除資料
       $('.deleteConfirm').on('click', function () {
 
         // 創建data物件
@@ -132,19 +134,31 @@
         // 刪除資料
         deleteData(data);
       });
-      
-    };
+
+      // 選擇每頁顯示筆數
+      $('.pageSelector').change(function () {
+        // 清除tbody資料
+        $('#tableBody').remove();
+        // 刷新每頁顯示筆數
+        loadAllData($(this).val());
+        
+      });
+ 
+      };
 
     /**
      * 載入全部資料
      */
-    var loadAllData = function () {
+    var loadAllData = function (limit = "", offset = "") {
       $.ajax({
         method: 'GET',
         url: self._ajaxUrls.accountApi,
+        data:{
+          "limit": limit,
+          "offset": offset
+        },
         dataType: 'json'
       }).done(function(data) {
-          // console.log(data);
           // 建立變數
           var tmp, table, tbody, tr, td;
           // 建立暫存容器
@@ -153,12 +167,10 @@
           tbody = $('<tbody id="tableBody"></tbody>').appendTo(tmp);
           
           // 建立內容
-          $.each(data, function(index1, value1) {
+          $.each(data.data, function(index1, value1) {
             tr = $('<tr></tr>').appendTo(tbody);
             tr.data('id', value1['id']);
             td = $(`<td><input type="checkbox" id="${value1['id']}"><button class="btn modifyBtn" data-toggle="modal" data-target="#modifyModal"><i class="fas fa-pen color_green ml-3"></i></button><button class="btn deleteBtn" data-toggle="modal" data-target="#deleteModal"><i class="fas fa-trash text-danger ml-3"></i></button></td>`).appendTo(tr)
-            // var accountTd = 
-            // $('<td>'+value1['account']+'</td>').appendTo(tr);
             $.each(value1, function(index2, value2) {
               td = $('<td>'+value2+'</td>').appendTo(tr);
             });
@@ -170,7 +182,7 @@
           tmp.children().appendTo(table);
         });
     };
-    
+
     /**
      * 新增資料
      */
@@ -247,7 +259,7 @@
     
       // 將表單序列化
       var newData = $($form).serializeArray();
-      
+
       // 資料驗證
       var dataCheck = dataValidation(newData);
 
@@ -296,6 +308,8 @@
           // 刷新資料
           loadAllData();
         };
+      }).fail(function () {
+        
       });
     };
 
@@ -326,6 +340,21 @@
         return false;
       };
 
+    };
+
+
+    /**
+     * 分頁
+     */
+    var pagination = function () {
+      $.ajax({
+        method: "GET",
+        url: self._ajaxUrls.accountApi,
+        dataType: 'json'
+      }).done(function (data) {
+        // console.log(data.length);return;
+        numberOfDatas = data.length;
+      });
     };
 
     /**
