@@ -33,31 +33,43 @@ class Crud_model extends CI_Model
      * @param string $limit 限制筆數
      * @param string $offset 跳過幾筆
      * @param string $col 選擇欄位
-     * @return void
+     * @return object
      */
-    public function get($limit = '', $offset = '', $col = '*')
+    public function get($limit = '', $offset = '', $keywords = '', $col = '*')
     {
         // 建立輸出陣列
         $opt = [];
 
-        // 判斷是否有limit條件
-        if(empty($limit)){
-            $res = $this->db->select($col)->from($this->table)->get()->result_array();
-            $num = $this->getNumbers();
-            $opt = [
-                'numbers' => $num,
-                'data' => $res
-            ];
-            return $opt;
-        } else {
-            $res = $this->db->select($col)->from($this->table)->limit($limit,$offset)->get()->result_array();
-            $num = $this->getNumbers();
-            $opt = [
-                'numbers' => $num,
-                'data' => $res
-            ];
-            return $opt;
+        $num = $this->getNumbers($keywords);
+        $query = $this->db->select($col)->from($this->table);
+
+        // 判斷是否有limit, keywords條件
+        if (!empty($keywords)) {
+            if (!empty($limit)) {
+                $query->limit($limit, $offset);
+            }
+            // 關鍵字搜尋
+            $query->like('id', $keywords);
+            $query->or_like('account', $keywords);
+            $query->or_like('name', $keywords);
+            $query->or_like('sex', $keywords);
+            $query->or_like('birthday', $keywords);
+            $query->or_like('email', $keywords);
+            $query->or_like('comments', $keywords);
+        } elseif (empty($keywords)) {
+            if (!empty($limit)) {
+                $query->limit($limit, $offset);
+            }
         }
+
+        $res = $query->get()->result_array();
+
+        $opt = [
+            'numbers' => $num,
+            'data' => $res
+        ];
+        // print_r($opt);exit;
+        return $opt;
     }
 
     /**
@@ -65,7 +77,7 @@ class Crud_model extends CI_Model
      *
      * @param [type] $id
      * @param string $col
-     * @return void
+     * @return array
      */
     public function getBy($id, $col = '*')
     {
@@ -126,12 +138,25 @@ class Crud_model extends CI_Model
 
     /**
      * 取得所有資料總筆數
-     *
+     *@param string $keywords 搜尋關鍵字
      * @return int
      */
-    public function getNumbers()
+    public function getNumbers($keywords = '')
     {
-        $num = $this->db->count_all_results($this->table);
+        if (!empty($keywords)) {
+            $query = $this->db->like('id', $keywords);
+            $query->or_like('account', $keywords);
+            $query->or_like('name', $keywords);
+            $query->or_like('sex', $keywords);
+            $query->or_like('birthday', $keywords);
+            $query->or_like('email', $keywords);
+            $query->or_like('comments', $keywords);
+
+            $num = $query->count_all_results($this->table);
+            
+        } else {
+            $num = $this->db->count_all_results($this->table);
+        }
 
         return $num;
     }

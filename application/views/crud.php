@@ -30,9 +30,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <div class="row">
             <div class="col-sm-4">
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="請輸入搜尋關鍵字">
+                    <input type="text" class="form-control search-text" placeholder="請輸入搜尋關鍵字">
                     <span class="input-group-btn">
-                        <button class="btn btn-default" type="button">搜尋!</button>
+                        <button class="btn btn-default search-btn" type="button">搜尋!</button>
                     </span>
                 </div>
             </div>
@@ -76,15 +76,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
 
         <!-- Pagination -->
-        <div class="row pull-right">
-            <ul class="pagination">
-                <li class="page-item"><a class="page-link" href="#">Previous</a></li>
-                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                <li class="page-item"><a class="page-link" href="#">Next</a></li>
-            </ul>
+        <div class="row pull-right page">
         </div>
+        <div id="current-page" style="display: none;" data-page="1"></div>
         <div class="row">
             <div id="ctrl-message" class="text-danger ctrl-message"></div>
         </div>
