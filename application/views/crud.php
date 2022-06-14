@@ -38,8 +38,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
             </div>
             <div class="col-sm-2"><button class="btn btn-warning" data-toggle="modal" data-target="#insertModal">新增</button></div>
             <div class="col-sm-2 btn-group sort-btn">
-                <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="flase">排序</button>
-                <button class="btn btn-primary dropdown-toggle" data-sort="none"><i class="fa fa-sort"></i></button>
+                <!-- <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="flase">排序</button> -->
+                <!-- <button class="btn btn-primary dropdown-toggle" data-sort="none"><i class="fa fa-sort"></i></button> -->
                     <ul class="dropdown-menu">
                         <li><a href="#" tabindex="-1" data-type="alpha">Name</a></li>
                         <li><a href="#" tabindex="-1" data-type="numeric">Account</a></li>
@@ -52,15 +52,15 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <div class="row">
             <table class="table table-striped table-bordered table-hover ctrl-table">
                 <thead>
-                    <tr>
+                    <tr class="ctr-tr">
                         <th><input type="checkbox" name="selectAll">Actions</th>
-                        <th>Id</th>
-                        <th>Account</th>
-                        <th>Name</th>
-                        <th>Sex</th>
-                        <th>Birthday</th>
-                        <th>Email</th>
-                        <th>Comments</th>
+                        <th>Id<button class="btn btn-default dropdown-toggle btn-xs sort-btn" data-sort="id"><i class="fa fa-sort"></i></button></th>
+                        <th>Account<button class="btn btn-default dropdown-toggle btn-xs sort-btn" data-sort="account"><i class="fa fa-sort"></i></button></th>
+                        <th>Name<button class="btn btn-default dropdown-toggle btn-xs sort-btn" data-sort="name"><i class="fa fa-sort"></i></button></th>
+                        <th>Sex<button class="btn btn-default dropdown-toggle btn-xs sort-btn" data-sort="sex"><i class="fa fa-sort"></i></button></th>
+                        <th>Birthday<button class="btn btn-default dropdown-toggle btn-xs sort-btn" data-sort="birthday"><i class="fa fa-sort"></i></button></th>
+                        <th>Email<button class="btn btn-default dropdown-toggle btn-xs sort-btn" data-sort="email"><i class="fa fa-sort"></i></button></th>
+                        <th>Comments<button class="btn btn-default dropdown-toggle btn-xs sort-btn" data-sort="comments"><i class="fa fa-sort"></i></button></th>
                     </tr>
                 </thead>
             </table>
@@ -68,7 +68,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
         <div>
             每頁顯示筆數
-            <select class="pageSelector">
+            <select class="pageSelector value="10">
             <option value="10">10筆</option>
             <option value="15">15筆</option>
             <option value="20">20筆</option>

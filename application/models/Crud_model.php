@@ -35,7 +35,7 @@ class Crud_model extends CI_Model
      * @param string $col 選擇欄位
      * @return object
      */
-    public function get($limit = '', $offset = '', $keywords = '', $col = '*')
+    public function get($limit = '', $offset = '', $keywords = '', $order_by = '', $descAsc = '', $col = '*')
     {
         // 建立輸出陣列
         $opt = [];
@@ -43,11 +43,8 @@ class Crud_model extends CI_Model
         $num = $this->getNumbers($keywords);
         $query = $this->db->select($col)->from($this->table);
 
-        // 判斷是否有limit, keywords條件
+        // 判斷是否有limit, keywords, orderby條件
         if (!empty($keywords)) {
-            if (!empty($limit)) {
-                $query->limit($limit, $offset);
-            }
             // 關鍵字搜尋
             $query->like('id', $keywords);
             $query->or_like('account', $keywords);
@@ -56,10 +53,14 @@ class Crud_model extends CI_Model
             $query->or_like('birthday', $keywords);
             $query->or_like('email', $keywords);
             $query->or_like('comments', $keywords);
-        } elseif (empty($keywords)) {
-            if (!empty($limit)) {
-                $query->limit($limit, $offset);
-            }
+        } 
+        
+        if (!empty($limit)) {
+            $query->limit($limit, $offset);
+        }
+
+        if (!empty($order_by)) {
+            $query->order_by($order_by, $descAsc);
         }
 
         $res = $query->get()->result_array();

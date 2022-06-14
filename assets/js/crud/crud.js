@@ -40,7 +40,6 @@
     // Application Options initialize
     var _options = options || {};
     var _jqXHRs;
-    var numberOfDatas;
 
     /**
      * 建構子
@@ -137,10 +136,8 @@
 
       // 選擇每頁顯示筆數
       $('.pageSelector').change(function () {
-        // 清除tbody資料
-        $('#tableBody').remove();
-        // 清除分頁
-        $('.pagination').remove();
+        // 重置頁數
+        $('#current-page').data('page', '1')
         // 刷新每頁顯示筆數
         loadAllData($(this).val(), '', $('.search-text').data('text'));
         
@@ -152,31 +149,48 @@
         var triggerPage = $(this).attr('id');
         // 取得當前顯示數量
         var numberDisplay = $('.pageSelector').val()
-        
+        // 計算從第幾筆資料開始取
+        var offset = numberDisplay * (triggerPage - 1);
+        //儲存offset
+        $('#current-page').data('offset', offset);
+        // 儲存當前頁面
         $('#current-page').data('page', triggerPage);
-        // 將激活的頁碼復原
-        // $('.active').removeClass('active').addClass('page-item');
-        // 將當前選取的頁碼機活
-        // $(`.page-item#${triggerPage}`).addClass('active').removeClass('page-item');
-        // 清除tbody資料
-        $('#tableBody').remove();
-        // 清除分頁
-        $('.pagination').remove();
         // 取得頁面資料
-        loadAllData(numberDisplay, numberDisplay * (triggerPage - 1), $('.search-text').data('text'));
+        loadAllData(numberDisplay, offset, $('.search-text').data('text'), $('.ctr-tr').data('sort'), $('.ctr-tr').data('status'));
 
       });
       
       // 點擊搜尋按鈕
       $('.search-btn').on('click', function () {
-        // console.log($('.search-text').val());
         // 將搜尋關鍵字存入data-text
         $('.search-text').data('text', $('.search-text').val())
-        // 清除tbody資料
-        $('#tableBody').remove();
-        // 清除分頁
-        $('.pagination').remove();
-        loadAllData(10,'',$('.search-text').val())
+        loadAllData($('.pageSelector').val(),'',$('.search-text').val())
+      });
+
+      // 點擊排序按鈕
+      $('.sort-btn').on('click', function () {
+        // 重置頁數
+        $('#current-page').data('page', '1')
+        // 儲存當前排序方式
+        $(this).parents('tr').data('sort', $(this).data('sort'));
+        // 判斷當前升冪(0)降冪(1)狀態，若無狀態設為0
+        if ($(this).data('status') == 0) {
+          // 儲存當前排序狀態
+          $(this).parents('tr').data('status', 'DESC');
+          $(this).data('status', 1);
+          loadAllData($('.pageSelector').val(), '', $('.search-text').val(), $(this).data('sort'), 'DESC');
+        } else if ($(this).data('status') == 1) {
+          // 儲存當前排序狀態
+          $(this).parents('tr').data('status', 'ASC');
+          $(this).data('status', 0);
+          loadAllData($('.pageSelector').val(), '', $('.search-text').val(), $(this).data('sort'), 'ASC');
+        } else if (!$(this).data('status')) {
+          // 儲存當前排序狀態
+          $(this).parents('tr').data('status', 'ASC');
+          $(this).data('status', 0);
+          loadAllData($('.pageSelector').val(), '', $('.search-text').val(), $(this).data('sort'), 'ASC');
+        }
+        
       });
 
     };
@@ -184,18 +198,27 @@
     /**
      * 載入全部資料
      */
-    var loadAllData = function (limit = '', offset = '', keywords = '') {
+    var loadAllData = function (limit = '', offset = '', keywords = '', orderBy = '', descAsc = '') {
       $.ajax({
         method: 'GET',
         url: self._ajaxUrls.accountApi,
         data:{
           "limit": limit,
           "offset": offset,
-          "keywords": keywords
+          "keywords": keywords,
+          "orderBy": orderBy,
+          "descAsc": descAsc
         },
         dataType: 'json'
       }).done(function(data) {
-          
+          /**
+           * 清除tbody及分頁
+           */
+          // 清除tbody資料
+          $('#tableBody').remove();
+          // 清除分頁
+          $('.pagination').remove();
+            
           /**
            * 建立表格
            */
@@ -259,6 +282,36 @@
       // 將表單序列化
       var insData = $($form).serializeArray();
       
+      // 確保資料格式正確
+      var dataColumn = [
+        {
+          'name': 'account',
+          'value': ''
+        },
+        {
+          'name': 'name',
+          'value': ''
+        },
+        {
+          'name': 'birthday',
+          'value': ''
+        },
+        {
+          'name': 'email',
+          'value': ''
+        },
+        {
+          'name': 'comments',
+          'value': ''
+        },
+        {
+          'name': 'sex',
+          'value': ''
+        }
+      ];
+      
+      // insData = $.extend([], dataColumn, insData);
+
       // 資料驗證
       var dataCheck = dataValidation(insData);
 
@@ -276,8 +329,6 @@
             alert("資料新增成功！");
             //關閉modal彈窗
             $('#insertModal').modal('hide');
-            // 清除tbody資料
-            $('#tableBody').remove();
             // 刷新資料
             loadAllData($('.pageSelector').val());
             // 清空表格欄位
@@ -345,12 +396,8 @@
               alert("資料更新成功！");
               //關閉modal彈窗
               $('#modifyModal').modal('hide');
-              // 清除tbody資料
-              $('#tableBody').remove();
-              // 清除分頁
-              $('.pagination').remove();
               // 刷新資料
-              loadAllData($('.pageSelector').val());
+              loadAllData($('.pageSelector').val(), $('#current-page').data('offset'));
             };
         });
       }else {
