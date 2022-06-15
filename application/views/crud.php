@@ -25,7 +25,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div class="col-sm-12">
                 <h1>帳號管理</h1>
             </div>
-        </div
+        </div>
         <!-- Controll Form -->
         <div class="row">
             <div class="col-sm-4">
@@ -37,13 +37,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 </div>
             </div>
             <div class="col-sm-2"><button class="btn btn-warning" data-toggle="modal" data-target="#insertModal">新增</button></div>
-            <div class="col-sm-2 btn-group sort-btn">
-                <!-- <button class="btn btn-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="flase">排序</button> -->
-                <!-- <button class="btn btn-primary dropdown-toggle" data-sort="none"><i class="fa fa-sort"></i></button> -->
-                    <ul class="dropdown-menu">
-                        <li><a href="#" tabindex="-1" data-type="alpha">Name</a></li>
-                        <li><a href="#" tabindex="-1" data-type="numeric">Account</a></li>
-                    </ul>
+            <div class="col-sm-2 btn-group">
+                <button class="btn btn-primary" id="import" type="button" onclick="$('#file-uploader').click()">匯入</button>
+                <button class="btn btn-primary" id="export" type="button">匯出</button>
             </div>
             <div class="col-sm-2"><button class="btn btn-danger deleteDatas" data-toggle="modal" data-target="#deleteModal">批次刪除</button></div>
         </div>
@@ -68,7 +64,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
         <div>
             每頁顯示筆數
-            <select class="pageSelector value="10">
+            <select class="pageSelector" value="10">
             <option value="10">10筆</option>
             <option value="15">15筆</option>
             <option value="20">20筆</option>
@@ -82,6 +78,14 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <div class="row">
             <div id="ctrl-message" class="text-danger ctrl-message"></div>
         </div>
+        <!-- ExportForm -->
+        <form action="crud/export" method="post" target="_blank" class="export-form" style="display: none;">
+            <input type="submit" value="Submit">
+        </form>
+        <div>
+            <input type="file" id="file-uploader" data-target="file-uploader" accept=".xlsx" style="display: none;"/>
+        </div>
+
     </div>
 
     <!-- The Insert Modal -->
@@ -128,7 +132,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <textarea class="form-control" id="commentsInput" name="comments" rows="3"></textarea>
                         </div>
                         <div>
-                            <p id="errorMessage" style="color:red"></p>
+                            <p class="errorMessage" id="insert" style="color:red"></p>
                         </div>
                     </form>
                 </div>
@@ -173,7 +177,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
                             <label class="radio-sex">
                                 <input type="radio" name="sex" id="sexRadio4" value="Female"> Female
                             </label>
-                        </div>    
+                        </div>
                         <div>
                             <p><b>Birthday*</b></p>
                             <input type="text" class="form-control" id="birthdayInput1" name="birthday" placeholder="ex:1999-03-22">
@@ -185,6 +189,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
                         <div>
                             <p><b>Comments</b></p>
                             <textarea class="form-control" id="commentsInput1" name="comments" rows="3"></textarea>
+                        </div>
+                        <div>
+                            <p class="errorMessage" id="modify" style="color:red"></p>
                         </div>
                     </form>
                 </div>

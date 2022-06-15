@@ -73,24 +73,24 @@
        * 事件 - 增加
        */
 
-      // 按下確認按鈕時，取得account之值
+      // 按下確認時，取得account之值
       $('.insert-confirm-btn').on('click', insertData);
 
-      // 按下修改按鈕時，取得欲修改資料的原始資料
-      $('.container').on('click', '.modifyBtn', function () {
+      // 按下修改時，取得欲修改資料的原始資料
+      $('.container').on('click', '.modifyBtn', function() {
         // 找到該資料的id
         var dataId = $(this).parents('tr').data('id');
         loadData(dataId);
       });
 
       // 送出更新
-      $('.modify-confirm-btn').on('click', function () {
+      $('.modify-confirm-btn').on('click', function() {
         var id = $(this).data('id');
         updateData(id);
       });
 
-      // 點擊刪除按鈕，取得欲刪除資料之id
-      $('.container').on('click', '.deleteBtn', function () {
+      // 點擊刪除，取得欲刪除資料之id
+      $('.container').on('click', '.deleteBtn', function() {
 
         // 創建一個陣列存放id
         var id = [];
@@ -103,8 +103,8 @@
         $('.deleteConfirm').data('id', data);
       });
 
-      // 點擊批次刪除按鈕，取得多個欲刪除資料之id
-      $('.deleteDatas').on('click', function () {
+      // 點擊批次刪除，取得多個欲刪除資料之id
+      $('.deleteDatas').on('click', function() {
         
         // 創建一個陣列存放id
         var id = [];
@@ -125,7 +125,7 @@
       });
 
       // 確認刪除資料
-      $('.deleteConfirm').on('click', function () {
+      $('.deleteConfirm').on('click', function() {
 
         // 創建data物件
         var data = $('.deleteConfirm').data('id');
@@ -135,7 +135,7 @@
       });
 
       // 選擇每頁顯示筆數
-      $('.pageSelector').change(function () {
+      $('.pageSelector').change(function() {
         // 重置頁數
         $('#current-page').data('page', '1')
         // 刷新每頁顯示筆數
@@ -144,7 +144,7 @@
       });
 
       // 選擇頁數
-      $('.container').on('click', '.page-item', function () {
+      $('.container').on('click', '.page-item', function() {
         // 取得觸發頁數
         var triggerPage = $(this).attr('id');
         // 取得當前顯示數量
@@ -160,15 +160,15 @@
 
       });
       
-      // 點擊搜尋按鈕
-      $('.search-btn').on('click', function () {
+      // 點擊搜尋
+      $('.search-btn').on('click', function() {
         // 將搜尋關鍵字存入data-text
         $('.search-text').data('text', $('.search-text').val())
         loadAllData($('.pageSelector').val(),'',$('.search-text').val())
       });
 
-      // 點擊排序按鈕
-      $('.sort-btn').on('click', function () {
+      // 點擊排序
+      $('.sort-btn').on('click', function() {
         // 重置頁數
         $('#current-page').data('page', '1')
         // 儲存當前排序方式
@@ -193,12 +193,38 @@
         
       });
 
+      // 點擊匯出
+      $('#export').on('click', function() {
+        var form = $('.export-form');
+        $(`<input type="text" id="export-data" name="keywords" value="${$('.search-text').val()}">`).appendTo(form);
+        $('.export-form').submit();
+        $('#export-data').remove();
+      });
+
+      // 檔案匯入
+      $('#file-uploader').on('change', function() {
+        var file = this.files[0];
+        var form = new FormData();
+        form.append('data', file)
+
+        $.ajax({
+          method: 'POST',
+          url: '/crud/import',
+          processData: false,
+          contentType: false,
+          data: form
+        }).done(function() {
+          alert('檔案匯入成功');
+        }).fail(function() {
+          alert('檔案匯入失敗')
+        });
+      });
     };
 
     /**
      * 載入全部資料
      */
-    var loadAllData = function (limit = '', offset = '', keywords = '', orderBy = '', descAsc = '') {
+    var loadAllData = function(limit = '', offset = '', keywords = '', orderBy = '', descAsc = '') {
       $.ajax({
         method: 'GET',
         url: self._ajaxUrls.accountApi,
@@ -229,7 +255,9 @@
           // 建立tbody區塊資料
           tbody = $('<tbody id="tableBody"></tbody>').appendTo(tmp);
           
-          // 建立內容
+          /**
+           * 建立內容
+           */
           $.each(data.data, function(index1, value1) {
             tr = $('<tr></tr>').appendTo(tbody);
             tr.data('id', value1['id']);
@@ -275,49 +303,17 @@
     /**
      * 新增資料
      */
-    var insertData = function () {
+    var insertData = function() {
       // 抓取表單
       var $form = $('.modal-body.insert').find('form')
-      
+
       // 將表單序列化
       var insData = $($form).serializeArray();
-      
-      // 確保資料格式正確
-      var dataColumn = [
-        {
-          'name': 'account',
-          'value': ''
-        },
-        {
-          'name': 'name',
-          'value': ''
-        },
-        {
-          'name': 'birthday',
-          'value': ''
-        },
-        {
-          'name': 'email',
-          'value': ''
-        },
-        {
-          'name': 'comments',
-          'value': ''
-        },
-        {
-          'name': 'sex',
-          'value': ''
-        }
-      ];
-      
-      // insData = $.extend([], dataColumn, insData);
 
-      // 資料驗證
-      var dataCheck = dataValidation(insData);
-
-      // 判斷資料驗證是否通過
-      if(dataCheck) {
-
+      try {
+        // 資料驗證
+        dataValidation(insData);
+        
         // ajax發送新增資料請求
         $.ajax({
           method: 'POST',
@@ -334,25 +330,27 @@
             // 清空表格欄位
             $('#modifyForm, #insertForm').find('input, textarea').not('input[type=radio]').val('');
             $('#modifyForm, #insertForm').find('input').prop('checked', false);
+            $('#modifyForm, #insertForm').find('.errorMessage#insert').text('');
             // 清除分頁
             $('.pagination').remove();
-        }).fail(function (jqXHR) {
+        }).fail(function(jqXHR) {
           console.log(jqXHR.statusText);
         });
-      } else {
-        alert('資料格式錯誤，請重新檢查輸入。');
-      };
+      } catch(e) {
+        $('.errorMessage#insert').text(e);
+      }
     };
+
 
     /**
      * 載入原資料
      */
-     var loadData = function (id) {
+     var loadData = function(id) {
       $.ajax({
         method: 'GET',
         url: self._ajaxUrls.accountApi + `/${id}`,
         dataType: 'json'
-      }).done(function (data) {
+      }).done(function(data) {
         //清空表格欄位
         $('#modifyForm, #insertForm').find('input, textarea').not('input[type=radio]').val('');
         $('#modifyForm, #insertForm').find('input').prop('checked', false);
@@ -372,49 +370,50 @@
     /**
      * 更新資料
      */
-    var updateData = function (id) {
+    var updateData = function(id) {
       // 抓取表單
       var $form = $('.modal-body.modify').find('form')
     
       // 將表單序列化
       var newData = $($form).serializeArray();
 
-      // 資料驗證
-      var dataCheck = dataValidation(newData);
+      try {
+        // 資料驗證
+        dataValidation(newData);
 
-      // 判斷資料驗證是否通過
-      if(dataCheck) {
         // ajax發送更新請求
         $.ajax({
           method: 'PUT',
           data: newData,
           url: self._ajaxUrls.accountApi + `/${id}`,
           dataType: 'json'
-        }).done(function (data) {
+        }).done(function(data) {
             // 判斷是否新增成功
             if(data != 0) {
               alert("資料更新成功！");
-              //關閉modal彈窗
+              // 關閉modal彈窗
               $('#modifyModal').modal('hide');
+              // 清除錯誤信息欄位
+              $('#modifyForm, #insertForm').find('.errorMessage#modify').text('');
               // 刷新資料
               loadAllData($('.pageSelector').val(), $('#current-page').data('offset'));
             };
         });
-      }else {
-        alert('資料格式錯誤，請重新檢查輸入。');
-      };
+      } catch(e) {
+        $('.errorMessage#modify').text(e);
+      }
     };
 
     /**
      * 刪除資料
      */
-    var deleteData = function (data) {
+    var deleteData = function(data) {
       $.ajax({
         method: 'DELETE',
         url: self._ajaxUrls.accountApi,
         data: data,
         dataType: 'json'
-      }).done(function (data) {
+      }).done(function(data) {
         // 判斷是否刪除成功
         if(data != 0) {
           alert("資料已刪除！");
@@ -427,7 +426,7 @@
           // 刷新資料
           loadAllData(10);
         };
-      }).fail(function () {
+      }).fail(function() {
         
       });
     };
@@ -435,30 +434,50 @@
     /**
      * 資料驗證
      */
-    var dataValidation = function (data) {
+    var dataValidation = function(data) {
+      // 建立空物件
+      var validData = {};
+
+      // 處理序列化資料=>{key: 'value'}
+      data.forEach(data => {
+        validData[data['name']] = data['value'];
+      });
+      // 驗證資料格式
+      var dataColumn = {
+        'account': '',
+        'name': '',
+        'sex': '',
+        'birthday': '',
+        'email': '',
+        'comments': ''
+      };
+
+      validData = Object.assign(dataColumn, validData);
+      
+
       var accountReg = /^[a-zA-Z\d]\w{3,13}[a-zA-z\d]$/i;
       var nameReg = /.+/;
+      var sexReg = /.+/;
       var birthdayReg = /^\d{4}-[01][0-9]-[0-3][0-9]$/;
       var emailReg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
       
-      var accountResult = accountReg.test(data[0]['value']);
-      var nameResult = nameReg.test(data[1]['value']);
-      var sexResult = function (data) {
-        if(data.length == 6) {
-          return true;
-        } else {
-          return false;
-        };
-      };
-      var birthdayResult = birthdayReg.test(data[3]['value']);
-      var emailResult = emailReg.test(data[4]['value']);
+      var accountCheck = accountReg.test(validData['account']);
+      var nameCheck = nameReg.test(validData['name']);
+      var sexCheck = sexReg.test(validData['sex']);
+      var birthdayCheck = birthdayReg.test(validData['birthday']);
+      var emailCheck = emailReg.test(validData['email']);
       
-      if(accountResult && nameResult && sexResult && birthdayResult && emailResult) {
-        return true;
-      } else {
-        return false;
-      };
-
+      if(!accountCheck) {
+        throw '**帳號驗證失敗**';
+      } else if(!nameCheck) {
+        throw '**姓名驗證失敗**';
+      } else if(!sexCheck) {
+        throw '**性別驗證失敗**';
+      } else if(!birthdayCheck) {
+        throw '**日期驗證失敗**';
+      } else if(!emailCheck) {
+        throw '**信箱驗證失敗**';
+      }
     };
 
 
@@ -468,7 +487,7 @@
     _construct(); 
   };
 
-  // Give the init function the Object prototype for later instantiation
+  // Give the init functionthe Object prototype for later instantiation
   App.fn.init.prototype = App.prototype;
   
   // Alias prototype function
