@@ -252,20 +252,12 @@ class Crud extends CI_Controller
         $mismatch = $io->getMismatch();
         // $mismatch = $io->getConfig()->getMismatch();
 
-        // echo 'Config Name = ' . $configName . "<br>\n";
-        // echo 'Data = ';
-        // var_export($data);
-        // echo "\n";
-        // echo 'Exception content = ';
-        // var_export($mismatch);
-
-
         /**
          * 資料驗證及差異處理
          */
         // 建立空陣列
         $acc_arr = $arr_exist = $update_data = $insert_data = $error_message = [];
-        
+
         try {
             for($i = 0; $i < count($data); $i++) {
                 // 資料驗證
@@ -274,12 +266,16 @@ class Crud extends CI_Controller
                     // 取得匯入資料之帳號名稱
                     array_push($acc_arr, $data[$i]['account']);
                 } catch (Exception $e) {
+                    // print_r($e);exit;
                     // 將資料驗證失敗的資訊存入陣列中
                     $error_message[$data[$i]['account']] = [
                         'code' => $e->getCode(),
                         'message' => $e->getMessage()
                     ];
                 }
+            }
+            if (!empty($error_message)) {
+                throw new Exception(serialize($error_message));
             }
             // 載入model
             $this->load->model('crud_model');
@@ -304,15 +300,12 @@ class Crud extends CI_Controller
                 $this->crud_model->batchUpdate($update_data);
             }
         } catch (Exception $e) {
+            http_response_code('400');
             echo json_encode([
                 'errorData' => $error_message
             ]);
+            exit;
         };
-        
-        
-
-
-        // $this->crud_model->batchAdd($data);
     }
 
 }

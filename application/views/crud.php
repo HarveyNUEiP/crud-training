@@ -12,6 +12,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
     <script src="node_modules/jquery/dist/jquery.min.js"></script>
     <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     <script src="node_modules/popper.js"></script>
+    <script src="node_modules/jquery/dist/jquery.rustaMsgBox.js"></script>
     <!-- Font Awesome Icon -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.9.0/css/all.min.css" />
     <!-- import javascript -->
@@ -82,6 +83,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <form action="crud/export" method="post" target="_blank" class="export-form" style="display: none;">
             <input type="submit" value="Submit">
         </form>
+        <!-- ImportInput -->
         <div>
             <input type="file" id="file-uploader" data-target="file-uploader" accept=".xlsx" style="display: none;"/>
         </div>
@@ -205,7 +207,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         </div>
     </div>
 
-    <!-- The Modify Modal -->
+    <!-- The Delete Modal -->
     <div class="modal fade" id="deleteModal" data-backdrop="static" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">

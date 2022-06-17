@@ -11,11 +11,10 @@
     window.Page = window.Page || new function() {}();
     window.Page[name] = App();
   });
-  
+
   var name = '{name}';
   var version = '{version}';
   var defaults = {};
-  
 
   var App = function(options) {
     return new App.fn.init(options);
@@ -33,7 +32,6 @@
       accountApi: '/crud/ajax'
     }
   };
-
 
   App.fn.init = function(options) {
     var self = this;
@@ -214,10 +212,18 @@
           contentType: false,
           data: form
         }).done(function() {
-          alert('檔案匯入成功');
-        }).fail(function() {
-          alert('檔案匯入失敗')
+          $.rustaMsgBox({
+            'content': "檔案匯入成功",
+            'mode': 'info'
+          }); 
+          loadAllData($('.pageSelector').val());
+        }).fail(function(jqXHR) {
+          console.log(jqXHR.statusText);
+          alert('檔案匯入失敗');
         });
+
+        // 清除上傳檔案
+        $('#file-uploader').val('');
       });
     };
 
@@ -312,7 +318,7 @@
 
       try {
         // 資料驗證
-        dataValidation(insData);
+        // dataValidation(insData);
         
         // ajax發送新增資料請求
         $.ajax({
@@ -340,7 +346,6 @@
         $('.errorMessage#insert').text(e);
       }
     };
-
 
     /**
      * 載入原資料
@@ -479,7 +484,6 @@
         throw '**信箱驗證失敗**';
       }
     };
-
 
     /**
      * *************Run Constructor*************
