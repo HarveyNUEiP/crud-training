@@ -42,15 +42,15 @@ class Crud extends CI_Controller
                 $this->_update($id, $data);
                 break;
             case 'DELETE':
-
-                if (empty($data['id'])) {
-                    //錯誤
-                    http_response_code(404);
-                    echo 'No Delete ID';
-                    exit;
-                } else {
-                    //刪除一筆資料
+                if(empty($id) & !empty($data['id'])) {
+                    // 批次刪除
                     $this->_delete($data['id']);
+                } else if(!empty($id) & empty($data['id'])) {
+                    // 單筆刪除
+                    $this->_delete($id);
+                } else {
+                    http_response_code(404);
+                    echo('No Delete Id');
                 }
                 break;
         }
@@ -100,7 +100,11 @@ class Crud extends CI_Controller
         // 取得資料
         $res = $this->crud_model->get($arr_params);
         // 取得資料筆數
-        $num = $this->crud_model->getNumbers($arr_params['keywords']);
+        if(!empty($get_params['keywords'])) {
+            $num = $this->crud_model->getNumbers($arr_params['keywords']);
+        } else {
+            $num = $this->crud_model->getNumbers();
+        }
         // 建立輸出陣列
         $opt = [
             'numbers' => $num,
@@ -245,12 +249,10 @@ class Crud extends CI_Controller
         $io = new \marshung\io\IO();
         // 匯入處理 - 取得匯入資料
         $data = $io->import($builder = 'Excel', $fileArgu = 'data');
-        // print_r($data);return;
         // 取得匯入config名子
         $configName = $io->getConfig()->getOption('configName');
         // 取得有異常有下拉選單內容
         $mismatch = $io->getMismatch();
-        // $mismatch = $io->getConfig()->getMismatch();
 
         /**
          * 資料驗證及差異處理
@@ -259,16 +261,15 @@ class Crud extends CI_Controller
         $acc_arr = $arr_exist = $update_data = $insert_data = $error_message = [];
 
         try {
-            for($i = 0; $i < count($data); $i++) {
+            foreach($data as $data) {
                 // 資料驗證
                 try{
-                    $this->dataValidation($data[$i]);
+                    $this->dataValidation($data);
                     // 取得匯入資料之帳號名稱
-                    array_push($acc_arr, $data[$i]['account']);
+                    $acc_arr[] = $data['account'];
                 } catch (Exception $e) {
-                    // print_r($e);exit;
                     // 將資料驗證失敗的資訊存入陣列中
-                    $error_message[$data[$i]['account']] = [
+                    $error_message[$data['account']] = [
                         'code' => $e->getCode(),
                         'message' => $e->getMessage()
                     ];
@@ -284,21 +285,20 @@ class Crud extends CI_Controller
             // 已存在帳號陣列處理
             $arr_exist = array_column($arr_exist, 'account');
             // 差異處理
-            for ($i = 0; $i < count($data); $i++) {
-                if (in_array($data[$i]['account'], $arr_exist)) {
-                    array_push($update_data, $data[$i]);
+            foreach($data as $data) {
+                if (in_array($data['account'], $arr_exist)) {
+                    $update_data[] = $data;
                 } else {
-                    array_push($insert_data, $data[$i]);
+                    $insert_data[] = $data;
                 }
             }
-            if (!empty($insert_data)) {
-                // 批次新增
-                $this->crud_model->batchAdd($insert_data);
-            }
-            if (!empty($update_data)) {
-                // 批次修改
-                $this->crud_model->batchUpdate($update_data);
-            }
+            
+            // 批次新增
+            $insert_data && $this->crud_model->batchAdd($insert_data);
+
+            // 批次修改
+            $update_data && $this->crud_model->batchUpdate($update_data);
+
         } catch (Exception $e) {
             http_response_code('400');
             echo json_encode([
