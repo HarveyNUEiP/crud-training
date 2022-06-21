@@ -102,6 +102,17 @@ defined('BASEPATH') or exit('No direct script access allowed');
                 <input type="text" class="form-control" id="emailInput" name="email" placeholder="email@example.com">
             </div>
             <div>
+                <p><b>Dept_No*</b></p>
+                <select name="dept_no">
+                    <option value="">請選擇部門</option>
+                    <option value="1">部門8627</option>
+                    <option value="2">部門1586</option>
+                    <option value="3">部門2205</option>
+                    <option value="4">部門3078</option>
+                    <option value="5">部門7129</option>
+                </select>
+            </div>
+            <div>
                 <p><b>Comments</b></p>
                 <textarea class="form-control" id="commentsInput" name="comments" rows="3"></textarea>
             </div>
@@ -139,6 +150,17 @@ defined('BASEPATH') or exit('No direct script access allowed');
             <div>
                 <p><b>Email*</b></p>
                 <input type="text" class="form-control" id="emailInput1" name="email" placeholder="email@example.com">
+            </div>
+            <div>
+                <p><b>Dept_No*</b></p>
+                <select name="dept_no">
+                    <option value="">請選擇部門</option>
+                    <option value="1">部門8627</option>
+                    <option value="2">部門1586</option>
+                    <option value="3">部門2205</option>
+                    <option value="4">部門3078</option>
+                    <option value="5">部門7129</option>
+                </select>
             </div>
             <div>
                 <p><b>Comments</b></p>
