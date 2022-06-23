@@ -11,7 +11,7 @@ $(function() {
   });
 
   var App = function() {
-    
+
     var self = this;
 
     // Application Options initialize
@@ -31,9 +31,6 @@ $(function() {
       self.initialize();
       // 建立綁定事件
       self.events();
-
-      // 載入資料並建立 DataTable
-      loadAllData();
     };
 
     /**
@@ -41,6 +38,9 @@ $(function() {
      */
     self.initialize = function() {
       console.log('_initialize');
+      
+      // 載入資料並建立 DataTable
+      loadAllData();
     };
 
     /**
@@ -48,7 +48,7 @@ $(function() {
      */
     self.events = function() {
       console.log('_eventsBind');
-      
+
       // 點擊新增
       $('.insert-btn').on('click', function() {
         // 跳出新增Modal
@@ -153,49 +153,57 @@ $(function() {
         $('input:checked').each(function() {
             id.push($(this).parents().children('.keyId').text())  
         });
-
-
-        // 跳出刪除Modal
-        BootstrapDialog.show({
-          // Modal 視窗標題
-          title: '刪除資料確認',
-          // Modal 視窗內容
-          message: '<span>確定要刪除資料嗎？</span>',
-          // Modal 視窗按鈕
-          buttons :[{
-            // 按鈕名稱
-            id: 'btn-confirm',
-            // 按鈕圖示
-            icon: 'glyphicon glyphicon-check',
-            // 按鈕文字
-            label: '確認',
-            // 按鈕顏色
-            cssClass: 'btn-success',
-            // 按鈕觸發之動作
-            action: function(dialog) {
-              // 關閉 Modal 視窗
-              var closeModal = function() {
+        
+        // 判斷有無勾選資料
+        if (id.length == 0) {
+          // 顯示錯誤訊息
+          $.rustaMsgBox({
+            'content': "無勾選資料",
+            'mode': 'error'
+          });
+        } else {
+          // 跳出刪除Modal 視窗
+          BootstrapDialog.show({
+            // Modal 視窗標題
+            title: '刪除資料確認',
+            // Modal 視窗內容
+            message: '<span>確定要刪除資料嗎？</span>',
+            // Modal 視窗按鈕
+            buttons :[{
+              // 按鈕名稱
+              id: 'btn-confirm',
+              // 按鈕圖示
+              icon: 'glyphicon glyphicon-check',
+              // 按鈕文字
+              label: '確認',
+              // 按鈕顏色
+              cssClass: 'btn-success',
+              // 按鈕觸發之動作
+              action: function(dialog) {
+                // 關閉 Modal 視窗
+                var closeModal = function() {
+                  dialog.close();
+                }
+                // 刪除多筆資料
+                deleteData(id, closeModal);
+              }
+            }, {
+              // 按鈕名稱
+              id: 'btn-cancel',
+              // 按鈕圖示
+              icon: 'glyphicon glyphicon-remove',
+              // 按鈕文字
+              label: '取消',
+              // 按鈕顏色
+              cssClass: 'btn-danger',
+              // 按鈕觸發之動作
+              action: function(dialog) {
                 dialog.close();
               }
-              // 刪除多筆資料
-              deleteData(id, closeModal);
-            }
-          }, {
-            // 按鈕名稱
-            id: 'btn-cancel',
-            // 按鈕圖示
-            icon: 'glyphicon glyphicon-remove',
-            // 按鈕文字
-            label: '取消',
-            // 按鈕顏色
-            cssClass: 'btn-danger',
-            // 按鈕觸發之動作
-            action: function(dialog) {
-              dialog.close();
-            }
-          }
-          ]
-        })
+            }]
+          })
+        }
+        
       });
 
       // 點擊編輯
@@ -259,17 +267,17 @@ $(function() {
         // 取得上傳檔案
         var file = this.files[0];
         // 創建一FormData
-        var form = new FormData();
+        var formData = new FormData();
         // 將檔案放入FormData
-        form.append('data', file)
+        formData.append('data', file)
 
-        // 將FormData發送至後端處理
+        // 將FormData發送至後端
         $.ajax({
           method: 'POST',
           url: '/crud/import',
           processData: false,
           contentType: false,
-          data: form
+          data: formData
         }).done(function() {
           // 顯示匯入成功訊息
           $.rustaMsgBox({
@@ -279,7 +287,6 @@ $(function() {
           // 刷新資料
           reload();
         }).fail(function(jqXHR) {
-          console.log(jqXHR.statusText);
           // 顯示匯入失敗訊息
           $.rustaMsgBox({
             'content': "檔案匯入失敗",
@@ -409,7 +416,10 @@ $(function() {
         buildDataTable(data.data);
       }).fail(function(jqXHR) {
         // 顯示錯誤資訊
-        console.log(jqXHR.statusText);
+        $.rustaMsgBox({
+          'content': "資料載入失敗",
+          'mode': 'error'
+        });
       });
     }
 
@@ -444,7 +454,10 @@ $(function() {
         })
       }).fail(function(jqXHR) {
         // 顯示錯誤資訊
-        console.log(jqXHR.statusText);
+        $.rustaMsgBox({
+          'content': "原資料載入失敗",
+          'mode': 'error'
+        });
       });
     }
 
@@ -468,7 +481,7 @@ $(function() {
           data: formData,
           dataType: 'json'
         }).done(function(data) {
-            // 通知新增成功
+            // 顯示新增成功訊息
             $.rustaMsgBox({
               content: "資料新增成功",
               mode: "success"
@@ -481,10 +494,13 @@ $(function() {
             reload();
         }).fail(function(jqXHR) {
           // 顯示錯誤資訊
-          console.log(jqXHR.statusText);
+          $.rustaMsgBox({
+            'content': "資料新增失敗",
+            'mode': 'error'
+          });
         });
       } catch(e) {
-        // 抓取錯誤訊息
+        // 抓取錯誤訊息，並顯示於視窗中
         $('.errorMessage#insert').text(e);
       }
       
@@ -626,7 +642,7 @@ $(function() {
       };
 
       validData = Object.assign(dataColumn, validData);
-      
+
       // 正規表示式
       var accountReg = /^[a-zA-Z\d]\w{3,13}[a-zA-z\d]$/i;
       var nameReg = /.+/;
@@ -642,7 +658,7 @@ $(function() {
       var birthdayCheck = birthdayReg.test(validData['birthday']);
       var deptNoCheck = deptNoReg.test(validData['dept_no']);
       var emailCheck = emailReg.test(validData['email']);
-      
+
       // 拋出錯誤信息
       if (!accountCheck) {
         throw '**帳號驗證失敗**';

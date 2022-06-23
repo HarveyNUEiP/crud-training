@@ -225,12 +225,12 @@ class Crud_model extends CI_Model
 
     /**
      * 取得所有資料總筆數
+     * 
      * @param string $keywords 搜尋關鍵字
      * @return int
      */
     public function getNumbers($keywords = '')
     {
-        // 
         $query = $this->db->from($this->acc_table);
 
         // 判斷關鍵字是否為空

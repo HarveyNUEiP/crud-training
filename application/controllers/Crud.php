@@ -63,13 +63,14 @@ class Crud extends CI_Controller
      */
     protected function _create($data)
     {
+        // 載入model
+        $this->load->model('crud_model');
+
         try {
             // 資料驗證，如錯誤丟出錯誤訊息
             $this->dataValidation($data);
 
             // 資料驗證成功，將資料新增至資料庫
-            // 載入model
-            $this->load->model('crud_model');
             $opt = $this->crud_model->post($data);
 
             // 輸出JSON
@@ -100,7 +101,7 @@ class Crud extends CI_Controller
 
         // 取得資料筆數
         if (!empty($get_params['keywords'])) {
-            $num = $this->crud_model->getNumbers($arr_params['keywords']);
+            $num = $this->crud_model->getNumbers($arr_params['keywords'] ?? '');
         } else {
             $num = $this->crud_model->getNumbers();
         }
@@ -139,6 +140,7 @@ class Crud extends CI_Controller
     {
         // 載入 model
         $this->load->model('crud_model');
+
         // 取得單筆資料
         $opt = $this->crud_model->getBy($id);
 
@@ -155,15 +157,14 @@ class Crud extends CI_Controller
      */
     protected function _update($id, $data)
     {
+        // 載入model
+        $this->load->model('crud_model');
+
         try {
             // 驗證資料，如錯誤丟出錯誤訊息
             $this->dataValidation($data);
 
             // 資料驗證成功，將資料更新至資料庫
-            // 載入model
-            $this->load->model('crud_model');
-
-            // 資料更新至資料庫
             $opt = $this->crud_model->put($id, $data);
 
             // 輸出JSON
@@ -191,6 +192,7 @@ class Crud extends CI_Controller
     {
         // 載入 Model
         $this->load->model('crud_model');
+
         // 刪除單筆資料
         $opt = $this->crud_model->delete($id);
 
@@ -309,7 +311,7 @@ class Crud extends CI_Controller
 
             // 載入model
             $this->load->model('crud_model');
-            // 取得資料已存在之帳號
+            // 取得已存在之帳號
             $arr_exist = $this->crud_model->getAcc($acc_arr, 'account');
             // 已存在帳號陣列處理
             $arr_exist = array_column($arr_exist, 'account');
@@ -323,9 +325,9 @@ class Crud extends CI_Controller
                 }
             }
 
-            // 批次新增
+            // 如新增的陣列不為空則批次新增
             $insert_data && $this->crud_model->batchAdd($insert_data);
-            // 批次修改
+            // 如修改的陣列不為空則批次修改
             $update_data && $this->crud_model->batchUpdate($update_data);
         } catch (Exception $e) {
             // 抓取錯誤訊息
