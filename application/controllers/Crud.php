@@ -183,7 +183,7 @@ class Crud extends CI_Controller
     }
 
     /**
-     * 刪除單筆資料
+     * 刪除單筆/多筆資料
      *
      * @param int $id 目標資料id
      * @return void
