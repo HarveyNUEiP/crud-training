@@ -38,7 +38,8 @@ $(function() {
     self.initialize = function() {
       console.log('_initialize');
       
-      getAllData();
+      // getAllData();
+      buildDataTable();
     }
 
     /**
@@ -299,8 +300,15 @@ $(function() {
       $('.export-btn').on('click', function() {
         // 取得匯出Form
         var form = $('.export-form');
-        // 將搜尋條件加入Form
-        $(`<input type="text" id="export-data" name="keywords" value="${$('input[type="search"]').val()}">`).appendTo(form);
+        // 取得搜尋參數
+        var limit = $('select[name="table_company_length"]').val();
+        var currentPage = $('.paginate_button.current').text();
+        var keywords = $('input[type="search"]').val();
+        var offset = (currentPage - 1) * limit;
+        // 將參數陣列放入Form
+        $(`<input type="text" id="export-data" name="searchParams" value=${limit}>`).appendTo(form);
+        $(`<input type="text" id="export-data2" name="offset" value=${offset}>`).appendTo(form);
+        $(`<input type="text" id="export-data3" name="keywords" value=${keywords}>`).appendTo(form);
         // 提交Form
         $('.export-form').submit();
         // 移除搜尋條件
@@ -313,11 +321,21 @@ $(function() {
      * 
      * @param {object} data 欲顯示之所有資料 
      */
-    var buildDataTable = function(data) {
+    var buildDataTable = function() {
       // 建立DataTable
       $('#table_company').DataTable({
         // 表單資料
-        "data": data,
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+          url: url.ajaxApi,
+          type: 'GET',
+        },
+        // "drawCallback": function( settings ) {
+        //   var api = this.api();
+        //   console.log(api.rows({page:'current'}).data());
+        //   var data = api.rows({page:'current'}).data();
+        // },
         "columns": [{
           // checkBox 欄位
             data: null
@@ -340,8 +358,8 @@ $(function() {
             data: "scale",
             title: "規模"
           }, {
-            data: "ndustry_id",
-            title: "行業別編號"
+            data: "ndustry_name",
+            title: "行業別名稱"
           }, {
             // 按鈕欄位
             data: null,
@@ -391,7 +409,6 @@ $(function() {
         data: keywords,
         dataType: 'json'
       }).done(function(data) {
-        // console.log(data);return;
         // 將取得之資料放入DataTable
         buildDataTable(data);
       }).fail(function() {
@@ -566,7 +583,7 @@ $(function() {
      */
     var deleteData = function(id, closeModal) {
       $.ajax({
-        method: 'DELTE',
+        method: 'DELETE',
         url: url.ajaxApi,
         data: {id : id},
         dataType: 'json'
@@ -651,7 +668,7 @@ $(function() {
       $('<table id="table_company" class="display"></table>').appendTo('.table-location');
 
       // 載入資料並建立表格
-      getAllData();
+      buildDataTable();
     }
 
     // 建構

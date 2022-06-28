@@ -1,4 +1,7 @@
 <?php
+
+use app\libraries\services\CompanyConfig;
+
 defined("BASEPATH") or exit('No direct script access allowed');
 
 class First_exam extends CI_Controller
@@ -19,7 +22,7 @@ class First_exam extends CI_Controller
         // 參數處理
         $method = strtoupper($_SERVER['REQUEST_METHOD']);
         $data = $this->input->input_stream();
-        $keywords = $this->input->get();
+        $data_params = $this->input->get();
 
         //行為分類
         switch($method) {
@@ -27,7 +30,7 @@ class First_exam extends CI_Controller
                 // 判斷有無$id
                 if(empty($id)) {
                     // 取得所有資料
-                    $this->_list($keywords);
+                    $this->_list($data_params);
                 } else {
                     // 取得單筆資料
                     $this->_get($id);
@@ -48,7 +51,6 @@ class First_exam extends CI_Controller
                     $this->_delete($id);
                 } else {
                     // 刪除多筆
-                    print_r($data);
                     $this->_deleteDatas($data);
                 }
                 break;
@@ -60,19 +62,98 @@ class First_exam extends CI_Controller
      * 
      * @return void
      */
-    public function _list($keywords)
+    public function _list($data_params)
     {
         // 載入 Model
         $this->load->model('first_exam_model');
+
+        /**
+         * 參數取得
+         */
+        // 取得過濾前資料總筆數
+        $recordsTotal = $this->first_exam_model->getTotalNumbers();
+        // 取得過濾後資料總筆數
+        $recordsFiltered = $this->first_exam_model->getTotalNumbers($data_params['search']['value']);
+        // 取得資料顯示限制筆數
+        $length = (int)$data_params['length'];
+        // 取得資料顯示起始
+        $offset = $data_params['start'];
+        // 取得搜尋關鍵字
+        $keywords = $data_params['search']['value'];
+        // 取得排序依據
+        $order_map = [
+            "0" => "id",
+            "1" => "name",
+            "2" => "founded_date",
+            "3" => "contact",
+            "4" => "email",
+            "5" => "scale",
+            "6" => "ndustry_id"
+        ];
+        $order_by = $order_map[$data_params['order'][0]['column']];
+        // 取得生冪/降冪
+        $desc_asc = $data_params['order'][0]['dir'];
+
+        /**
+         * 參數陣列
+         */
+        $search_params = [
+            'limit' => $length,
+            'offset' => $offset,
+            'keywords' => $keywords,
+            'order_by' => $order_by,
+            'desc_asc' => $desc_asc
+        ];
+
         // 取得資料
-        $opt = $this->first_exam_model->list($keywords);
+        $res = $this->first_exam_model->list($search_params);
+
+        /**
+         * 行業別編號轉換行業類型名稱
+         */
+        // 取得行業別編號
+        $ndustry_id = array_column($res, 'ndustry_id', 'ndustry_id');
+        // 判斷有無資料，若無資料則跳過此步驟
+        if (!empty($ndustry_id)) {
+            // 取得行業類型名稱
+            $ndustry_name = $this->first_exam_model->getNdustryName($ndustry_id);
+            // 行業編號、類型對映表
+            $ndustry_map = array_column($ndustry_name, 'name', 'id');
+        }
+
+        /**
+         * 公司規模中英轉換
+         */
+        // 規模中英對映表
+        $scale_map = [
+            'big' => '大',
+            'medium' => '中',
+            'small' => '小'
+        ];
+
+        // 創建輸出陣列
+        $opt = [];
+        // 編號轉換類別名稱，公司規格英轉中。
+        foreach ($res as $data) {
+            $data['ndustry_name'] = $ndustry_map[$data['ndustry_id']];
+            $data['scale'] = $scale_map[$data['scale']];
+            array_push($opt, $data);
+        }
+
+        $tableOpt = [
+            "draw"=> $data_params['draw'],
+            "recordsTotal"=> $recordsTotal,
+            "recordsFiltered"=> $recordsFiltered,
+            "data" => $opt,
+        ];
+
         // 回傳結果至前端
-        echo json_encode($opt);
+        echo json_encode($tableOpt);
     }
 
     /**
      * 取得單筆資料
-     *
+     *  
      * @param int $id 欲取得之資料id
      * @return void
      */
@@ -136,7 +217,7 @@ class First_exam extends CI_Controller
             echo json_encode($res);
 
         } catch (Exception $e) {
-            
+
             // 印出錯誤代碼
             http_response_code($e->getCode());
 
@@ -171,7 +252,12 @@ class First_exam extends CI_Controller
      */
     public function _deleteDatas($data)
     {
-        
+        // 載入 Model
+        $this->load->model('first_exam_model');
+        // 執行軟刪除
+        $res = $this->first_exam_model->softDeleteDatas($data);
+        // 回傳結果
+        echo json_encode($res);
     }
 
     /**
@@ -212,16 +298,17 @@ class First_exam extends CI_Controller
     public function export()
     {
         // 獲取資料查詢條件
-        $keywords = $this->input->post();
-        // print_r($keywords['keywords']);exit;
+        $search_params = $this->input->post();
         // 載入model
         $this->load->model('first_exam_model');
         // 取得資料
-        $data = $this->first_exam_model->list($keywords['keywords']);
+        $data = $this->first_exam_model->list($search_params);
         // IO物件建構
         $io = new \marshung\io\IO();
+        // config物件建構
+        $company = new CompanyConfig;
         // 匯出處理 - 建構匯出資料
-        $io->export($data, $config = 'Company', $builder = 'Excel', $style = 'Io');
+        $io->export($data, $config = $company, $builder = 'Excel', $style = 'Io');
     }
 
     /**
@@ -273,7 +360,7 @@ class First_exam extends CI_Controller
             $this->load->model('first_exam_model');
             // 取得已存在之帳號
             $id_exist = $this->first_exam_model->getBy($id_arr, 'id');
-            // print_r($id_exist);exit;
+            print_r($id_exist);
             // 已存在帳號陣列處理
             $id_exist = array_column($id_exist, 'id');
 
@@ -285,7 +372,7 @@ class First_exam extends CI_Controller
                     $insert_data[] = $valid_data;
                 }
             }
-
+            // print_r($update_data);
             // 如新增的陣列不為空則批次新增
             $insert_data && $this->first_exam_model->batchAdd($insert_data);
             // 如修改的陣列不為空則批次修改

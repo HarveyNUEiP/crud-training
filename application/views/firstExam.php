@@ -69,7 +69,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <!-- /ImportInput -->
 
     </div>
-    <!-- Form Template -->
+    <!-- Form Modal Template -->
     <script type="text/template" id="detail-form">
         <form id="formModal">
             <div class="form-group">

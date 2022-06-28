@@ -100,11 +100,7 @@ class Crud extends CI_Controller
         $res = $this->crud_model->get($arr_params);
 
         // 取得資料筆數
-        if (!empty($get_params['keywords'])) {
-            $num = $this->crud_model->getNumbers($arr_params['keywords'] ?? '');
-        } else {
-            $num = $this->crud_model->getNumbers();
-        }
+        $num = $this->crud_model->getNumbers($arr_params['keywords'] ?? '');
 
         /**
          * 部門編號轉換部門名稱
