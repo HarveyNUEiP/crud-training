@@ -74,36 +74,8 @@ class First_exam extends CI_Controller
         $recordsTotal = $this->first_exam_model->getTotalNumbers();
         // 取得過濾後資料總筆數
         $recordsFiltered = $this->first_exam_model->getTotalNumbers($data_params['search']['value']);
-        // 取得資料顯示限制筆數
-        $length = (int)$data_params['length'];
-        // 取得資料顯示起始
-        $offset = $data_params['start'];
-        // 取得搜尋關鍵字
-        $keywords = $data_params['search']['value'];
-        // 取得排序依據
-        $order_map = [
-            "0" => "id",
-            "1" => "name",
-            "2" => "founded_date",
-            "3" => "contact",
-            "4" => "email",
-            "5" => "scale",
-            "6" => "ndustry_id"
-        ];
-        $order_by = $order_map[$data_params['order'][0]['column']];
-        // 取得生冪/降冪
-        $desc_asc = $data_params['order'][0]['dir'];
-
-        /**
-         * 參數陣列
-         */
-        $search_params = [
-            'limit' => $length,
-            'offset' => $offset,
-            'keywords' => $keywords,
-            'order_by' => $order_by,
-            'desc_asc' => $desc_asc
-        ];
+        // 參數處理
+        $search_params = $this->paramsFilter($data_params);
 
         // 取得資料
         $res = $this->first_exam_model->list($search_params);
@@ -133,7 +105,7 @@ class First_exam extends CI_Controller
 
         // 創建輸出陣列
         $opt = [];
-        // 編號轉換類別名稱，公司規格英轉中。
+        // 編號轉換類別名稱，公司規格英轉中
         foreach ($res as $data) {
             $data['ndustry_name'] = $ndustry_map[$data['ndustry_id']];
             $data['scale'] = $scale_map[$data['scale']];
@@ -271,10 +243,14 @@ class First_exam extends CI_Controller
 
         // 正規表示式
         $name_reg = '/.{1,20}/';
-        $date_reg = '/^\d{4}-[01][0-9]-[0-3][0-9][T ][0-2][0-9]:[0-6][0-9]:[0-6][0-9]$/';
+        $date_reg = '/^\d{4}-[01][0-9]-[0-3][0-9][T ][0-2][0-9]:[0-6][0-9](:[0-6][0-9]$)?/';
         $contact_reg = '/.+/';
         $email_reg = '/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/';
-        $scale_reg = '/.+/';
+        $scale_map = [
+            "big",
+            "medium",
+            "small"
+        ];
 
         // 驗證資料
         if (!preg_match($name_reg, $data['name'])) {
@@ -285,7 +261,7 @@ class First_exam extends CI_Controller
             throw new Exception("聯絡窗口驗證失敗", 400);
         } elseif (!preg_match($email_reg, $data['email'])) {
             throw new Exception("信箱驗證失敗", 400);
-        } elseif (!preg_match($scale_reg, $data['scale'])) {
+        } elseif (!in_array($data['scale'], $scale_map)) {
             throw new Exception("公司規模驗證失敗", 400);
         }
     }
@@ -299,6 +275,8 @@ class First_exam extends CI_Controller
     {
         // 獲取資料查詢條件
         $search_params = $this->input->post();
+        // 參數處理
+        $search_params = $this->paramsFilter(json_decode($search_params['searchParams'], true));
         // 載入model
         $this->load->model('first_exam_model');
         // 取得資料
@@ -360,7 +338,6 @@ class First_exam extends CI_Controller
             $this->load->model('first_exam_model');
             // 取得已存在之帳號
             $id_exist = $this->first_exam_model->getBy($id_arr, 'id');
-            print_r($id_exist);
             // 已存在帳號陣列處理
             $id_exist = array_column($id_exist, 'id');
 
@@ -372,7 +349,6 @@ class First_exam extends CI_Controller
                     $insert_data[] = $valid_data;
                 }
             }
-            // print_r($update_data);
             // 如新增的陣列不為空則批次新增
             $insert_data && $this->first_exam_model->batchAdd($insert_data);
             // 如修改的陣列不為空則批次修改
@@ -385,5 +361,47 @@ class First_exam extends CI_Controller
             ]);
             exit;
         };
+    }
+
+    /**
+     * 處理DataTable參數，用做資料庫查詢
+     *
+     * @param array $data_params
+     * @return void
+     */
+    public function paramsFilter($data_params)
+    {
+        // 取得資料顯示限制筆數
+        $length = (int)$data_params['length'];
+        // 取得資料顯示起始
+        $offset = $data_params['start'];
+        // 取得搜尋關鍵字
+        $keywords = $data_params['search']['value'];
+        // 取得排序依據
+        $order_map = [
+            "0" => "id",
+            "1" => "name",
+            "2" => "founded_date",
+            "3" => "contact",
+            "4" => "email",
+            "5" => "scale",
+            "6" => "ndustry_id"
+        ];
+        $order_by = $order_map[$data_params['order'][0]['column']];
+        // 取得生冪/降冪
+        $desc_asc = $data_params['order'][0]['dir'];
+
+        /**
+         * 參數陣列
+         */
+        $search_params = [
+            'limit' => $length,
+            'offset' => $offset,
+            'keywords' => $keywords,
+            'order_by' => $order_by,
+            'desc_asc' => $desc_asc
+        ];
+
+        return $search_params;
     }
 }

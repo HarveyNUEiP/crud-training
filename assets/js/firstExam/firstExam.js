@@ -50,7 +50,6 @@ $(function() {
       
       // 按下新增
       $('.insert-btn').on('click', function() {
-        // console.log('新增');return;
         // 顯示新增 Modal 視窗
         BootstrapDialog.show({
           // Modal 標題
@@ -301,14 +300,10 @@ $(function() {
         // 取得匯出Form
         var form = $('.export-form');
         // 取得搜尋參數
-        var limit = $('select[name="table_company_length"]').val();
-        var currentPage = $('.paginate_button.current').text();
-        var keywords = $('input[type="search"]').val();
-        var offset = (currentPage - 1) * limit;
-        // 將參數陣列放入Form
-        $(`<input type="text" id="export-data" name="searchParams" value=${limit}>`).appendTo(form);
-        $(`<input type="text" id="export-data2" name="offset" value=${offset}>`).appendTo(form);
-        $(`<input type="text" id="export-data3" name="keywords" value=${keywords}>`).appendTo(form);
+        var dataTable = $('#table_company').DataTable()
+        var params = dataTable.ajax.params();
+        // 將參數放入Form
+        $(`<input type="text" id="export-data" name="searchParams" value=${JSON.stringify(params)}>`).appendTo(form);
         // 提交Form
         $('.export-form').submit();
         // 移除搜尋條件
@@ -331,11 +326,6 @@ $(function() {
           url: url.ajaxApi,
           type: 'GET',
         },
-        // "drawCallback": function( settings ) {
-        //   var api = this.api();
-        //   console.log(api.rows({page:'current'}).data());
-        //   var data = api.rows({page:'current'}).data();
-        // },
         "columns": [{
           // checkBox 欄位
             data: null
@@ -508,6 +498,7 @@ $(function() {
       // 表單資料序列化
       var formData = $('#formModal').serializeArray();
 
+      // console.log(formData);return;
       try {
         // 資料驗證
         dataValidation(formData);
@@ -629,7 +620,7 @@ $(function() {
 
       // 正規表示式
       var nameReg = /.{1,20}/;
-      var dateReg = /^\d{4}-[01][0-9]-[0-3][0-9][T ][0-2][0-9]:[0-6][0-9]:[0-6][0-9]$/;
+      var dateReg = /^\d{4}-[01][0-9]-[0-3][0-9][T ][0-2][0-9]:[0-6][0-9](:[0-6][0-9])?$/;
       var contactReg = /.+/;
       var emailReg = /^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/;
       var scaleReg = /.+/;
